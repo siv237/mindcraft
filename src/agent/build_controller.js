@@ -19,6 +19,7 @@ export class BuildController {
         this.failCount = 0;
         this.lastAction = null;
         this.queue = new BuildQueue(this);
+        this.verifiedBlocks = new Set();
     }
 
     get bot() {
@@ -115,18 +116,46 @@ export class BuildController {
             this.buildSite = position;
         } else {
             const pos = this.bot.entity.position;
-            this.buildSite = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
+            let x = Math.floor(pos.x);
+            let y = Math.floor(pos.y);
+            let z = Math.floor(pos.z);
+            const groundY = this.findGroundLevel(x, y, z);
+            if (groundY !== null) {
+                y = groundY;
+                this.log(`GROUND found at (${x},${y},${z}) — building from surface`);
+            }
+            this.buildSite = { x, y, z };
         }
         this.phase = 'tools';
         this.phaseIndex = 0;
         this.active = true;
         this.failCount = 0;
+        this.verifiedBlocks = new Set();
         this.queue.load();
         this.queue.addTask(name, this.buildSite);
         this.saveState();
         this.agent.memory_bank.rememberPlace('build_site',
             this.buildSite.x, this.buildSite.y, this.buildSite.z);
         this.log(`START build '${name}' at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
+    }
+
+    findGroundLevel(x, y, z) {
+        for (let dy = 0; dy <= 20; dy++) {
+            const checkY = y - dy;
+            if (checkY < -64) break;
+            const block = this.bot.blockAt(new Vec3(x, checkY, z));
+            if (block && block.name !== 'air' && block.name !== 'void_air') {
+                return checkY + 1;
+            }
+        }
+        for (let dy = 0; dy <= 10; dy++) {
+            const checkY = y + dy;
+            const block = this.bot.blockAt(new Vec3(x, checkY, z));
+            if (block && block.name !== 'air' && block.name !== 'void_air') {
+                return checkY + 1;
+            }
+        }
+        return null;
     }
 
     switchTo(blueprintName, position = null) {
@@ -373,13 +402,18 @@ export class BuildController {
         const missing = [];
         for (const cell of all) {
             if (cell.blueprintBlock === 'air') continue;
+            const wp = this.getWorldPos(cell.x, cell.y, cell.z);
+            const wpKey = `${wp.x},${wp.y},${wp.z}`;
+            if (this.verifiedBlocks.has(wpKey)) continue;
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current || !blockSatisfied(cell.blueprintBlock, current)) {
-                if (current && current.name !== 'air') continue;
+                if (current && current.name !== 'air' && current.name !== 'void_air') continue;
+                const dist = this.bot.entity.position.distanceTo(wp);
+                if (dist > 32) continue;
                 missing.push({
                     x: cell.x, y: cell.y, z: cell.z,
                     blueprintBlock: cell.blueprintBlock,
-                    worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
+                    worldPos: wp,
                 });
                 if (missing.length >= limit) break;
             }
@@ -625,6 +659,20 @@ export class BuildController {
             }
         }
 
+        if (progress.percent < 100) {
+            const sitePos = new Vec3(this.buildSite.x, this.buildSite.y, this.buildSite.z);
+            const distToSite = this.bot.entity.position.distanceTo(sitePos);
+            if (distToSite > 16) {
+                this.log(`GO TO build site — bot is ${Math.floor(distToSite)} blocks away from (${this.buildSite.x},${this.buildSite.y},${this.buildSite.z})`);
+                return {
+                    type: 'goto',
+                    done: false,
+                    worldPos: sitePos,
+                    message: `BUILD PROGRESS: ${progress.percent}%. You are too far from build site ${siteStr} (${Math.floor(distToSite)} blocks). Go there first. Respond:`,
+                };
+            }
+        }
+
         const wrong = this.findWrongBlocks();
         if (wrong.length > 0) {
             const w = wrong[0];
@@ -648,6 +696,16 @@ export class BuildController {
     }
 
     async executeDirect(action) {
+        if (action.type === 'goto') {
+            const wp = action.worldPos;
+            this.log(`GOTO build site at (${wp.x},${wp.y},${wp.z})`);
+            const actionFn = async () => {
+                await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 8);
+            };
+            const res = await this.agent.actions.runAction('build:goto', actionFn, { timeout: 60 });
+            this.log(`GOTO result: ${res.message?.substring(0, 100)}`);
+            return res;
+        }
         if (action.type === 'place') {
             const wp = action.worldPos;
             this.log(`PLACE ${action.blockType} at (${wp.x},${wp.y},${wp.z})`);
@@ -656,12 +714,14 @@ export class BuildController {
                 await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
             };
             let res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
+            const wpKey = `${wp.x},${wp.y},${wp.z}`;
             if (res.message && (res.message.includes('Failed to place') || res.success === false)) {
                 this.failCount++;
                 this.log(`PLACE FAILED #${this.failCount} at (${wp.x},${wp.y},${wp.z}): ${res.message.substring(0, 100)}`);
                 if (this.failCount >= 3) {
                     this.log(`SKIP block at (${wp.x},${wp.y},${wp.z}) after ${this.failCount} failures`);
                     this.failCount = 0;
+                    this.verifiedBlocks.add(wpKey);
                     return res;
                 }
                 const actionFn2 = async () => {
@@ -674,10 +734,12 @@ export class BuildController {
                     this.log(`PLACE RETRY FAILED at (${wp.x},${wp.y},${wp.z})`);
                 } else {
                     this.failCount = 0;
+                    this.verifiedBlocks.add(wpKey);
                     this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
                 }
             } else {
                 this.failCount = 0;
+                this.verifiedBlocks.add(wpKey);
                 this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
             }
             return res;
