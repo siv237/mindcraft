@@ -415,7 +415,10 @@ export const actionsList = [
                     return `Player '${near_player}' not found or too far away. Ask them to come closer.`;
                 }
             }
-            agent.build_controller.switchTo(blueprint_name, position);
+            const result = agent.build_controller.switchTo(blueprint_name, position);
+            if (result === false) {
+                return `Cannot build '${blueprint_name}' here — overlaps with an existing structure. Use !buildQueue to see existing builds, or !demolish to remove one.`;
+            }
             const progress = agent.build_controller.computeProgress();
             const site = agent.build_controller.buildSite;
             const queueLen = agent.build_controller.queue.tasks.length;
@@ -468,6 +471,38 @@ export const actionsList = [
             }
             agent.self_prompter.startBuildLoop(agent.build_controller);
             return msg;
+        }
+    },
+    {
+        name: '!demolish',
+        description: 'Demolish a completed building so a new one can be built in its place. Use !buildQueue to find the task ID.',
+        params: {
+            'task_id': { type: 'string', description: 'The task ID from !buildQueue.' },
+        },
+        perform: async function (agent, task_id) {
+            if (!agent.build_controller) return 'No build controller.';
+            const task = agent.build_controller.demolish(task_id);
+            if (task) {
+                return `Demolished '${task.blueprintName}' at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z}). You can now build something new there.`;
+            }
+            return `Task '${task_id}' not found. Use !buildQueue to see task IDs.`;
+        }
+    },
+    {
+        name: '!repairAll',
+        description: 'Check all completed builds for damage and repair any that are broken.',
+        perform: async function (agent) {
+            if (!agent.build_controller) return 'No build controller.';
+            agent.build_controller.queue.load();
+            const damaged = agent.build_controller.checkDamagedBuilds();
+            if (damaged) {
+                agent.build_controller.repair(damaged);
+                if (!agent.self_prompter.isActive()) {
+                    agent.self_prompter.startBuildLoop(agent.build_controller);
+                }
+                return `Found damaged '${damaged.blueprintName}' at (${damaged.buildSite.x},${damaged.buildSite.y},${damaged.buildSite.z}). Starting repair.`;
+            }
+            return 'All completed builds are intact. No repairs needed.';
         }
     },
     {

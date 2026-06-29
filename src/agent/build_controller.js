@@ -126,17 +126,95 @@ export class BuildController {
             }
             this.buildSite = { x, y, z };
         }
+        this.queue.load();
+        const overlap = this.checkOverlap(this.buildSite);
+        if (overlap) {
+            this.log(`OVERLAP: build site (${this.buildSite.x},${this.buildSite.y},${this.buildSite.z}) overlaps with existing '${overlap.blueprintName}' at (${overlap.buildSite.x},${overlap.buildSite.y},${overlap.buildSite.z}). Aborting.`);
+            return false;
+        }
         this.phase = 'tools';
         this.phaseIndex = 0;
         this.active = true;
         this.failCount = 0;
         this.verifiedBlocks = new Set();
-        this.queue.load();
         this.queue.addTask(name, this.buildSite);
         this.saveState();
         this.agent.memory_bank.rememberPlace('build_site',
             this.buildSite.x, this.buildSite.y, this.buildSite.z);
         this.log(`START build '${name}' at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
+        return true;
+    }
+
+    checkOverlap(site) {
+        const { sx, sz, sy } = this.getDimensions();
+        const offset = this.blueprint.offset || 0;
+        for (const task of this.queue.tasks) {
+            if (task.status === 'done' || task.status === 'active' || task.status === 'paused') {
+                const dx = Math.abs(site.x - task.buildSite.x);
+                const dz = Math.abs(site.z - task.buildSite.z);
+                const dy = Math.abs(site.y - task.buildSite.y);
+                if (dx < sx && dz < sz && dy < sy + 5) {
+                    return task;
+                }
+            }
+        }
+        return null;
+    }
+
+    getBuildBounds(site) {
+        const { sx, sz, sy } = this.getDimensions();
+        const offset = this.blueprint.offset || 0;
+        return {
+            minX: site.x, maxX: site.x + sx - 1,
+            minY: site.y + offset, maxY: site.y + sy - 1 + offset,
+            minZ: site.z, maxZ: site.z + sz - 1,
+        };
+    }
+
+    checkDamagedBuilds() {
+        const doneBuilds = this.queue.getDone();
+        const recentlyCompleted = this.queue.tasks.find(t => t.status === 'done' && t.completedAt && (Date.now() - t.completedAt < 5000));
+        for (const task of doneBuilds) {
+            if (recentlyCompleted && task.id === recentlyCompleted.id) continue;
+            const savedBlueprint = this.blueprint;
+            const savedSite = this.buildSite;
+            try {
+                this.loadBlueprint(task.blueprintName);
+                this.buildSite = task.buildSite;
+                const progress = this.computeProgress();
+                if (progress.percent < 100) {
+                    this.log(`DAMAGE DETECTED: '${task.blueprintName}' at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z}) was ${progress.percent}% (was 100%). Needs repair.`);
+                    this.blueprint = savedBlueprint;
+                    this.buildSite = savedSite;
+                    return task;
+                }
+            } catch (e) {
+            }
+            this.blueprint = savedBlueprint;
+            this.buildSite = savedSite;
+        }
+        return null;
+    }
+
+    repair(task) {
+        this.log(`REPAIR: starting repair of '${task.blueprintName}' at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z})`);
+        this.loadBlueprint(task.blueprintName);
+        this.buildSite = task.buildSite;
+        this.phase = 'tools';
+        this.active = true;
+        this.failCount = 0;
+        this.verifiedBlocks = new Set();
+        task.status = 'active';
+        this.queue.save();
+        this.saveState();
+    }
+
+    demolish(taskId) {
+        const task = this.queue.tasks.find(t => t.id === taskId);
+        if (!task) return null;
+        this.log(`DEMOLISH: removing '${task.blueprintName}' at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z})`);
+        this.queue.removeTask(taskId);
+        return task;
     }
 
     findGroundLevel(x, y, z) {
@@ -180,7 +258,8 @@ export class BuildController {
             this.active = false;
             this.saveState();
         }
-        this.start(blueprintName, position);
+        const result = this.start(blueprintName, position);
+        return result;
     }
 
     complete() {
@@ -188,6 +267,12 @@ export class BuildController {
         this.log(`COMPLETE: '${completed}' finished`);
         this.active = false;
         this.saveState();
+        const damaged = this.checkDamagedBuilds();
+        if (damaged) {
+            this.log(`AUTO-REPAIR: switching to repair '${damaged.blueprintName}'`);
+            this.repair(damaged);
+            return damaged;
+        }
         const next = this.queue.completeCurrent();
         if (next) {
             this.log(`AUTO-RESUME: starting next task '${next.blueprintName}'`);
@@ -196,8 +281,15 @@ export class BuildController {
             this.phase = 'tools';
             this.active = true;
             this.failCount = 0;
+            this.verifiedBlocks = new Set();
             this.saveState();
             return next;
+        }
+        const damagedAfter = this.checkDamagedBuilds();
+        if (damagedAfter) {
+            this.log(`AUTO-REPAIR: switching to repair '${damagedAfter.blueprintName}'`);
+            this.repair(damagedAfter);
+            return damagedAfter;
         }
         return null;
     }
@@ -405,6 +497,13 @@ export class BuildController {
             const wp = this.getWorldPos(cell.x, cell.y, cell.z);
             const wpKey = `${wp.x},${wp.y},${wp.z}`;
             if (this.verifiedBlocks.has(wpKey)) continue;
+            if (cell.blueprintBlock === 'door') {
+                const below = this.bot.blockAt(new Vec3(wp.x, wp.y - 1, wp.z));
+                if (below && below.name.includes('door')) {
+                    this.verifiedBlocks.add(wpKey);
+                    continue;
+                }
+            }
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current || !blockSatisfied(cell.blueprintBlock, current)) {
                 if (current && current.name !== 'air' && current.name !== 'void_air') continue;
@@ -711,6 +810,38 @@ export class BuildController {
         };
     }
 
+    verifyPlacement(wp, blockType) {
+        const offsets = [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, -1, 0],
+            [0, 0, 1],
+            [0, 0, -1],
+            [1, 0, 0],
+            [-1, 0, 0],
+        ];
+        let verified = 0;
+        for (const [dx, dy, dz] of offsets) {
+            const pos = new Vec3(wp.x + dx, wp.y + dy, wp.z + dz);
+            const block = this.bot.blockAt(pos);
+            if (!block) continue;
+            const key = `${pos.x},${pos.y},${pos.z}`;
+            for (const cell of this.getAllBlocks()) {
+                if (this.verifiedBlocks.has(key)) continue;
+                const cellWp = this.getWorldPos(cell.x, cell.y, cell.z);
+                if (cellWp.x === pos.x && cellWp.y === pos.y && cellWp.z === pos.z) {
+                    if (blockSatisfied(cell.blueprintBlock, block)) {
+                        this.verifiedBlocks.add(key);
+                        verified++;
+                    }
+                }
+            }
+        }
+        if (verified > 0) {
+            this.log(`VERIFY: ${verified} blocks verified around (${wp.x},${wp.y},${wp.z})`);
+        }
+    }
+
     async executeDirect(action) {
         if (action.type === 'placeBatch') {
             let placed = 0;
@@ -726,13 +857,11 @@ export class BuildController {
                 const res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
                 if (res.message && (res.message.includes('Failed to place') || res.success === false)) {
                     failed++;
-                    this.log(`BATCH PLACE FAILED at (${wp.x},${wp.y},${wp.z})`);
+                    this.log(`BATCH PLACE FAILED ${blk.blockType} at (${wp.x},${wp.y},${wp.z}): ${res.message?.substring(0, 80)}`);
                 } else {
                     placed++;
                     this.verifiedBlocks.add(wpKey);
-                    if (blk.blockType.includes('door')) {
-                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
-                    }
+                    this.verifyPlacement(wp, blk.blockType);
                 }
             }
             this.log(`BATCH: placed ${placed} blocks, ${failed} failed`);
@@ -764,9 +893,7 @@ export class BuildController {
                     this.log(`SKIP block at (${wp.x},${wp.y},${wp.z}) after ${this.failCount} failures`);
                     this.failCount = 0;
                     this.verifiedBlocks.add(wpKey);
-                    if (action.blockType.includes('door')) {
-                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
-                    }
+                    this.verifyPlacement(wp, action.blockType);
                     return res;
                 }
                 const actionFn2 = async () => {
@@ -780,22 +907,14 @@ export class BuildController {
                 } else {
                     this.failCount = 0;
                     this.verifiedBlocks.add(wpKey);
-                    if (action.blockType.includes('door')) {
-                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
-                        this.log(`PLACE OK door (both halves) at (${wp.x},${wp.y},${wp.z})`);
-                    } else {
-                        this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
-                    }
+                    this.verifyPlacement(wp, action.blockType);
+                    this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
                 }
             } else {
                 this.failCount = 0;
                 this.verifiedBlocks.add(wpKey);
-                if (action.blockType.includes('door')) {
-                    this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
-                    this.log(`PLACE OK door (both halves) at (${wp.x},${wp.y},${wp.z})`);
-                } else {
-                    this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
-                }
+                this.verifyPlacement(wp, action.blockType);
+                this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
             }
             return res;
         }

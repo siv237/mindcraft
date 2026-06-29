@@ -565,7 +565,79 @@ describe('BuildController - regression tests', () => {
         bc.start('house_5x5', { x: 10, y: 20, z: 30 });
         assert.strictEqual(bc.queue.tasks.length, 1, 'should have 1 task');
         const next = bc.complete();
-        assert.strictEqual(next, null, 'no pending tasks');
+        assert.strictEqual(next, null, 'no pending or damaged tasks');
+    });
+
+    it('checkOverlap should detect overlapping build sites', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.queue.tasks = [{
+            id: 'test1', blueprintName: 'house_5x5',
+            buildSite: { x: 10, y: 20, z: 30 },
+            status: 'done',
+        }];
+        const overlap = bc.checkOverlap({ x: 11, y: 21, z: 31 });
+        assert.ok(overlap, 'should detect overlap with existing build');
+    });
+
+    it('checkOverlap should not detect non-overlapping sites', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.queue.tasks = [{
+            id: 'test1', blueprintName: 'house_5x5',
+            buildSite: { x: 100, y: 20, z: 100 },
+            status: 'done',
+        }];
+        const overlap = bc.checkOverlap({ x: 10, y: 20, z: 30 });
+        assert.strictEqual(overlap, null);
+    });
+
+    it('start should return false on overlap', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.queue.tasks = [{
+            id: 'test1', blueprintName: 'house_5x5',
+            buildSite: { x: 0, y: 0, z: 0 },
+            status: 'done',
+        }];
+        bc.queue.save = () => {};
+        bc.queue.load = () => bc.queue.tasks;
+        bc.saveState = () => {};
+        const result = bc.start('house_5x5', { x: 1, y: 1, z: 1 });
+        assert.strictEqual(result, false, 'should not start on overlap');
+    });
+
+    it('demolish should remove task from queue', () => {
+        bc.queue.tasks = [{
+            id: 'demolish_me', blueprintName: 'house_5x5',
+            buildSite: { x: 10, y: 20, z: 30 },
+            status: 'done',
+        }];
+        const removed = bc.demolish('demolish_me');
+        assert.ok(removed);
+        assert.strictEqual(bc.queue.tasks.length, 0);
+    });
+
+    it('demolish should return null for unknown task', () => {
+        bc.queue.tasks = [];
+        const result = bc.demolish('nonexistent');
+        assert.strictEqual(result, null);
+    });
+
+    it('checkDamagedBuilds should return null when all intact', () => {
+        bc.queue.tasks = [];
+        const damaged = bc.checkDamagedBuilds();
+        assert.strictEqual(damaged, null);
+    });
+
+    it('repair should set task to active', () => {
+        bc.queue.tasks = [{
+            id: 'repair_me', blueprintName: 'house_5x5',
+            buildSite: { x: 10, y: 20, z: 30 },
+            status: 'done',
+        }];
+        bc.queue.save = () => {};
+        bc.saveState = () => {};
+        bc.repair(bc.queue.tasks[0]);
+        assert.strictEqual(bc.queue.tasks[0].status, 'active');
+        assert.strictEqual(bc.active, true);
     });
 
     it('getNextAction should not crash with resolveBlockName', () => {

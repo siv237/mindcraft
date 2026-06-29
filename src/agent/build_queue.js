@@ -124,7 +124,7 @@ export class BuildQueue {
         let msg = `Build queue (${this.tasks.length} tasks):\n`;
         for (const t of this.tasks) {
             const icon = t.status === 'active' ? '[ACTIVE]' : t.status === 'paused' ? '[PAUSED]' : '[DONE]';
-            msg += `  ${icon} ${t.blueprintName} at (${t.buildSite.x},${t.buildSite.y},${t.buildSite.z})\n`;
+            msg += `  ${icon} ${t.blueprintName} at (${t.buildSite.x},${t.buildSite.y},${t.buildSite.z}) id=${t.id}\n`;
         }
         const pending = this.getPending().length;
         const done = this.getDone().length;
