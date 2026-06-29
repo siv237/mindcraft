@@ -454,6 +454,10 @@ export class BuildController {
         return clearable;
     }
 
+    resolveBlockName(blueprintName) {
+        return getTypeOfGeneric(this.bot, blueprintName);
+    }
+
     findSalvageBlocks(targetBlock) {
         const resolvedTarget = this.resolveBlockName(targetBlock);
         const all = this.getAllBlocks();

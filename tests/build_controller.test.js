@@ -16,12 +16,14 @@ function makeMockBot({ spawnPoint = { x: 100, y: 64, z: 200 }, position = { x: 1
         entity: { position },
         game: { dimension: 'minecraft:overworld', gameMode },
         inventory: { slots: [] },
+        registry: { blocksByName: { planks: { id: 5 }, oak_planks: { id: 5 }, cobblestone: { id: 4 }, stone_bricks: { id: 1 }, door: { id: 64 }, oak_door: { id: 64 }, air: { id: 0 }, dirt: { id: 3 }, torch: { id: 50 } } },
         blockAt(pos) {
             const key = `${pos.x},${pos.y},${pos.z}`;
             if (blocks[key]) return { name: blocks[key] };
             return { name: 'air' };
         },
         modes: { isOn: () => false },
+        findBlocks: () => [],
         _inv: inv,
     };
 }
@@ -434,5 +436,320 @@ describe('Command blocking', () => {
         };
         const result = await executeCommand(mockAgent, '!stop');
         assert.ok(result);
+    });
+});
+
+describe('BuildController - regression tests', () => {
+    let agent, bc;
+
+    beforeEach(() => {
+        agent = makeMockAgent();
+        bc = new BuildController(agent);
+        Object.defineProperty(bc, 'worldDir', { get: () => TEST_DIR });
+    });
+
+    it('resolveBlockName should be a function and not crash', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        assert.strictEqual(typeof bc.resolveBlockName, 'function');
+        const name = bc.resolveBlockName('cobblestone');
+        assert.strictEqual(name, 'cobblestone');
+    });
+
+    it('findWrongBlocks should not return air-where-planks-expected', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        const wrong = bc.findWrongBlocks();
+        for (const w of wrong) {
+            assert.notStrictEqual(w.actual, 'air', 'air blocks should not be wrong');
+        }
+    });
+
+    it('findWrongBlocks should return non-air wrong blocks', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        agent.bot = makeMockBot({ blocks: { '0,0,0': 'dirt' } });
+        bc.agent.bot = agent.bot;
+        const wrong = bc.findWrongBlocks();
+        const dirtWrong = wrong.find(w => w.actual === 'dirt' && w.expected === 'planks');
+        assert.ok(dirtWrong, 'dirt where planks expected should be wrong');
+    });
+
+    it('findClearableBlocks should only find non-air where blueprint=air', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        const offset = bc.blueprint.offset || 0;
+        const { sx, sz, sy } = bc.getDimensions();
+        const blocks = {};
+        for (let y = 0; y < sy; y++) {
+            for (let z = 0; z < sz; z++) {
+                for (let x = 0; x < sx; x++) {
+                    const bp = bc.blueprint.blocks[y][z][x];
+                    if (bp === 'air') {
+                        blocks[`${x},${y + offset},${z}`] = 'dirt';
+                    } else {
+                        blocks[`${x},${y + offset},${z}`] = 'air';
+                    }
+                }
+            }
+        }
+        agent.bot = makeMockBot({ blocks });
+        bc.agent.bot = agent.bot;
+        const clearable = bc.findClearableBlocks();
+        assert.ok(clearable.length > 0, 'should find blocks to clear where blueprint=air');
+        for (const c of clearable) {
+            assert.strictEqual(c.expected, 'air');
+            assert.notStrictEqual(c.actual, 'air');
+        }
+    });
+
+    it('findClearableBlocks should return empty when all air positions are air', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        agent.bot = makeMockBot();
+        bc.agent.bot = agent.bot;
+        const clearable = bc.findClearableBlocks();
+        assert.strictEqual(clearable.length, 0);
+    });
+
+    it('findSalvageBlocks should find salvageable blocks in wrong positions', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        const offset = bc.blueprint.offset || 0;
+        const { sx, sz, sy } = bc.getDimensions();
+        const blocks = {};
+        for (let y = 0; y < sy; y++) {
+            for (let z = 0; z < sz; z++) {
+                for (let x = 0; x < sx; x++) {
+                    const bp = bc.blueprint.blocks[y][z][x];
+                    if (bp === 'air') {
+                        blocks[`${x},${y + offset},${z}`] = 'cobblestone';
+                    } else {
+                        blocks[`${x},${y + offset},${z}`] = 'air';
+                    }
+                }
+            }
+        }
+        agent.bot = makeMockBot({ blocks });
+        bc.agent.bot = agent.bot;
+        const salvage = bc.findSalvageBlocks('cobblestone');
+        assert.ok(salvage.length > 0, 'should find salvageable cobblestone');
+        for (const s of salvage) {
+            assert.strictEqual(s.actual, 'cobblestone');
+        }
+    });
+
+    it('switchTo should pause current and start new', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.start('house_5x5', { x: 10, y: 20, z: 30 });
+        assert.strictEqual(bc.active, true);
+        assert.deepStrictEqual(bc.buildSite, { x: 10, y: 20, z: 30 });
+        bc.switchTo('house_5x5', { x: 50, y: 60, z: 70 });
+        assert.deepStrictEqual(bc.buildSite, { x: 50, y: 60, z: 70 });
+        assert.strictEqual(bc.active, true);
+    });
+
+    it('complete should mark current done and return next pending', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.start('house_5x5', { x: 10, y: 20, z: 30 });
+        bc.switchTo('house_5x5', { x: 50, y: 60, z: 70 });
+        const next = bc.complete();
+        assert.ok(next, 'should return next pending task');
+        assert.deepStrictEqual(next.buildSite, { x: 10, y: 20, z: 30 });
+    });
+
+    it('complete should return null when no pending tasks', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.queue.tasks = [];
+        try { rmSync(join(TEST_DIR, 'build_queue.json'), { force: true }); } catch {}
+        bc.start('house_5x5', { x: 10, y: 20, z: 30 });
+        assert.strictEqual(bc.queue.tasks.length, 1, 'should have 1 task');
+        const next = bc.complete();
+        assert.strictEqual(next, null, 'no pending tasks');
+    });
+
+    it('getNextAction should not crash with resolveBlockName', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        bc.active = true;
+        bc.phase = 'done';
+        bc.queue.tasks = [];
+        agent.bot = makeMockBot({ gameMode: 'creative' });
+        bc.agent.bot = agent.bot;
+        const all = bc.getAllBlocks();
+        const blocks = {};
+        for (const cell of all) {
+            blocks[`${cell.x},${cell.y + (bc.blueprint.offset||0)},${cell.z}`] = cell.blueprintBlock === 'planks' ? 'planks' : cell.blueprintBlock;
+        }
+        agent.bot = makeMockBot({ gameMode: 'creative', blocks });
+        bc.agent.bot = agent.bot;
+        const action = bc.getNextAction();
+        assert.ok(action);
+        assert.strictEqual(action.type, 'done');
+    });
+});
+
+describe('BuildQueue', () => {
+    let bc, queue;
+
+    beforeEach(() => {
+        const agent = makeMockAgent();
+        bc = new BuildController(agent);
+        Object.defineProperty(bc, 'worldDir', { get: () => TEST_DIR });
+        queue = bc.queue;
+    });
+
+    afterEach(() => {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+        mkdirSync(TEST_DIR, { recursive: true });
+    });
+
+    it('should add first task as active', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        const current = queue.getCurrent();
+        assert.ok(current);
+        assert.strictEqual(current.blueprintName, 'house_5x5');
+        assert.strictEqual(current.status, 'active');
+    });
+
+    it('should pause current when adding new task', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.addTask('watchtower', { x: 50, y: 60, z: 70 });
+        const current = queue.getCurrent();
+        assert.strictEqual(current.blueprintName, 'watchtower');
+        const pending = queue.getPending();
+        assert.strictEqual(pending.length, 1);
+        assert.strictEqual(pending[0].blueprintName, 'house_5x5');
+        assert.strictEqual(pending[0].status, 'paused');
+    });
+
+    it('should resume first pending after complete', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.addTask('watchtower', { x: 50, y: 60, z: 70 });
+        const next = queue.completeCurrent();
+        assert.ok(next);
+        assert.strictEqual(next.blueprintName, 'house_5x5');
+        assert.strictEqual(next.status, 'active');
+    });
+
+    it('should return null when no pending after complete', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        const next = queue.completeCurrent();
+        assert.strictEqual(next, null);
+    });
+
+    it('should persist to file and reload', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.addTask('watchtower', { x: 50, y: 60, z: 70 });
+        assert.ok(existsSync(queue.file));
+        const newQueue = new (queue.constructor)(bc);
+        newQueue.load();
+        assert.strictEqual(newQueue.tasks.length, 2);
+        assert.strictEqual(newQueue.getCurrent().blueprintName, 'watchtower');
+    });
+
+    it('should track done tasks', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.completeCurrent();
+        assert.strictEqual(queue.getDone().length, 1);
+        assert.strictEqual(queue.getPending().length, 0);
+    });
+
+    it('should handle multiple pauses and resumes', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.addTask('watchtower', { x: 50, y: 60, z: 70 });
+        queue.addTask('lighthouse', { x: 100, y: 200, z: 300 });
+        assert.strictEqual(queue.getCurrent().blueprintName, 'lighthouse');
+        assert.strictEqual(queue.getPending().length, 2);
+        const next = queue.completeCurrent();
+        assert.strictEqual(next.blueprintName, 'house_5x5');
+        const next2 = queue.completeCurrent();
+        assert.strictEqual(next2.blueprintName, 'watchtower');
+        const next3 = queue.completeCurrent();
+        assert.strictEqual(next3, null);
+    });
+
+    it('summary should show all tasks', () => {
+        queue.load();
+        queue.addTask('house_5x5', { x: 10, y: 20, z: 30 });
+        queue.addTask('watchtower', { x: 50, y: 60, z: 70 });
+        const s = queue.summary();
+        assert.match(s, /house_5x5/);
+        assert.match(s, /watchtower/);
+        assert.match(s, /ACTIVE/);
+        assert.match(s, /PAUSED/);
+    });
+});
+
+describe('Method integrity - all methods exist and are callable', () => {
+    let bc;
+    before(() => {
+        const agent = makeMockAgent();
+        bc = new BuildController(agent);
+    });
+
+    const requiredMethods = [
+        'loadBlueprint', 'listBlueprints', 'start', 'switchTo', 'complete', 'stop',
+        'getDimensions', 'getWorldPos', 'scanBlock', 'getAllBlocks', 'computeProgress',
+        'determinePhase', 'isLevelComplete', 'findWrongBlocks', 'findMissingBlocks',
+        'findClearableBlocks', 'findSalvageBlocks', 'getInventoryCounts', 'resolveBlockName',
+        'countNeededMaterials', 'countMissingMaterials', 'getToolAction', 'getNextAction',
+        'executeDirect', 'formatClearAction', 'formatSalvageAction', 'formatPlaceAction',
+        'formatGatherAction', 'saveState', 'loadState', 'getWorldId', 'log',
+    ];
+
+    for (const method of requiredMethods) {
+        it(`BuildController.${method} should be a function`, () => {
+            assert.strictEqual(typeof bc[method], 'function', `${method} is not a function`);
+        });
+    }
+
+    it('BuildQueue should have all required methods', () => {
+        const queue = bc.queue;
+        const queueMethods = ['load', 'save', 'addTask', 'completeCurrent', 'nextPending',
+            'getCurrent', 'getPending', 'getDone', 'getAll', 'removeTask', 'clearCompleted', 'summary'];
+        for (const m of queueMethods) {
+            assert.strictEqual(typeof queue[m], 'function', `BuildQueue.${m} is not a function`);
+        }
+    });
+
+    it('SelfPrompter should have all required methods', async () => {
+        const { SelfPrompter } = await import('../src/agent/self_prompter.js');
+        const agent = makeMockAgent();
+        const sp = new SelfPrompter(agent);
+        const spMethods = ['start', 'startBuildLoop', 'isActive', 'isStopped', 'isPaused',
+            'handleLoad', 'setPromptPaused', 'startLoop', 'update', 'stopLoop', 'stop',
+            'pause', 'shouldInterrupt', 'handleUserPromptedCmd'];
+        for (const m of spMethods) {
+            assert.strictEqual(typeof sp[m], 'function', `SelfPrompter.${m} is not a function`);
+        }
+    });
+
+    it('Commands should have build-related commands', async () => {
+        const { getCommand } = await import('../src/agent/commands/index.js');
+        const commands = ['!startBuild', '!newBuild', '!checkBuild', '!listBlueprints', '!buildQueue',
+            '!goal', '!endGoal', '!stop', '!placeHere', '!discard', '!collectBlocks', '!craftRecipe'];
+        for (const cmd of commands) {
+            const c = getCommand(cmd);
+            assert.ok(c, `${cmd} command not found in commandMap`);
+            assert.strictEqual(typeof c.perform, 'function', `${cmd} perform is not a function`);
+        }
+    });
+
+    it('Blueprints should all be loadable and valid', () => {
+        const bps = bc.listBlueprints();
+        assert.ok(bps.length >= 9, `expected at least 9 blueprints, got ${bps.length}`);
+        for (const bp of bps) {
+            assert.ok(bp.name, 'blueprint should have name');
+            assert.ok(bp.size, 'blueprint should have size');
+            assert.match(bp.size, /\d+x\d+x\d+/);
+        }
     });
 });
