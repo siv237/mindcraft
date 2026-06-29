@@ -108,9 +108,11 @@ export function parseCommandMessage(message) {
 
     const params = commandParams(command);
     const paramNames = commandParamNames(command);
+    const optionalCount = params.filter(p => p.optional).length;
+    const requiredCount = params.length - optionalCount;
     
-    if (args.length !== params.length)
-        return `Command ${command.name} was given ${args.length} args, but requires ${params.length} args.`;
+    if (args.length < requiredCount || args.length > params.length)
+        return `Command ${command.name} was given ${args.length} args, but requires ${requiredCount}-${params.length} args.`;
 
     
     for (let i = 0; i < args.length; i++) {
@@ -219,8 +221,11 @@ export async function executeCommand(agent, message) {
         if (parsed.args) {
             numArgs = parsed.args.length;
         }
-        if (numArgs !== numParams(command))
-            return `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.`;
+        const params = commandParams(command);
+        const optionalCount = params.filter(p => p.optional).length;
+        const requiredCount = params.length - optionalCount;
+        if (numArgs < requiredCount || numArgs > params.length)
+            return `Command ${command.name} was given ${numArgs} args, but requires ${requiredCount}-${params.length} args.`;
         else {
             if (parsed.commandName === '!placeHere' && agent.build_controller?.active) {
                 return 'Do not use !placeHere during building. The build controller places blocks automatically. Use !discard to drop unwanted items.';
@@ -269,7 +274,9 @@ export function getCommandDocs(agent) {
         if (command.params) {
             docs += 'Params:\n';
             for (let param in command.params) {
-                docs += `${param}: (${typeTranslations[command.params[param].type]??command.params[param].type}) ${command.params[param].description}\n`;
+                const p = command.params[param];
+                const opt = p.optional ? ' (optional)' : '';
+                docs += `${param}: (${typeTranslations[p.type]??p.type}) ${p.description}${opt}\n`;
             }
         }
     }

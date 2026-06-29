@@ -383,9 +383,10 @@ export const actionsList = [
         name: '!startBuild',
         description: 'Start building a structure from a blueprint. The bot will continuously scan, gather materials, and place blocks until the structure is complete.',
         params: {
-            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5).' },
+            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5, watchtower, lighthouse).' },
+            'near_player': { type: 'string', description: 'Player name to build near. Bot will build at that player position. Optional.', optional: true },
         },
-        perform: async function (agent, blueprint_name) {
+        perform: async function (agent, blueprint_name, near_player) {
             if (!agent.build_controller) {
                 agent.build_controller = new BuildController(agent);
             }
@@ -400,7 +401,18 @@ export const actionsList = [
                 }
                 return msg;
             }
-            agent.build_controller.start(blueprint_name);
+            let position = null;
+            if (near_player) {
+                const player = agent.bot.players[near_player];
+                if (player && player.entity) {
+                    const pos = player.entity.position;
+                    position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
+                    agent.openChat(`Building '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
+                } else {
+                    return `Player '${near_player}' not found or too far away. Build at my position instead? Use !startBuild("${blueprint_name}").`;
+                }
+            }
+            agent.build_controller.start(blueprint_name, position);
             const progress = agent.build_controller.computeProgress();
             const site = agent.build_controller.buildSite;
             let msg = `Started building '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
@@ -413,18 +425,30 @@ export const actionsList = [
     },
     {
         name: '!newBuild',
-        description: 'Start a NEW building at current position, abandoning any previous build.',
+        description: 'Start a NEW building at current position or near a player, abandoning any previous build.',
         params: {
-            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5).' },
+            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5, watchtower, lighthouse).' },
+            'near_player': { type: 'string', description: 'Player name to build near. Bot will build at that player position. Optional.', optional: true },
         },
-        perform: async function (agent, blueprint_name) {
+        perform: async function (agent, blueprint_name, near_player) {
             if (!agent.build_controller) {
                 agent.build_controller = new BuildController(agent);
             }
             if (agent.build_controller.active) {
                 agent.build_controller.stop();
             }
-            agent.build_controller.start(blueprint_name);
+            let position = null;
+            if (near_player) {
+                const player = agent.bot.players[near_player];
+                if (player && player.entity) {
+                    const pos = player.entity.position;
+                    position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
+                    agent.openChat(`Building NEW '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
+                } else {
+                    return `Player '${near_player}' not found or too far away. Build at my position instead? Use !newBuild("${blueprint_name}").`;
+                }
+            }
+            agent.build_controller.start(blueprint_name, position);
             const progress = agent.build_controller.computeProgress();
             const site = agent.build_controller.buildSite;
             let msg = `Started NEW build '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
