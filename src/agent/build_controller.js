@@ -347,30 +347,27 @@ export class BuildController {
     async executeDirect(action) {
         if (action.type === 'place') {
             const wp = action.worldPos;
-            console.log(`BuildController: directly placing ${action.blockType} at (${wp.x}, ${wp.y}, ${wp.z})`);
-            const isCheat = this.bot.modes.isOn('cheat');
+            console.log(`BuildController: placing ${action.blockType} at (${wp.x}, ${wp.y}, ${wp.z})`);
             const actionFn = async () => {
-                if (!isCheat) {
-                    await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 4);
-                }
+                await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 3);
                 await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
             };
-            const res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
-            if (!isCheat && res.message && res.message.includes('Failed to place')) {
-                console.log('BuildController: place failed, retrying closer...');
+            let res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
+            if (res.message && res.message.includes('Failed to place')) {
+                console.log(`BuildController: retry from different angle...`);
                 const actionFn2 = async () => {
-                    await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 2);
+                    await skills.goToPosition(this.bot, wp.x + 1, wp.y, wp.z + 1, 2);
                     await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
                 };
-                return await this.agent.actions.runAction('build:place', actionFn2, { timeout: 30 });
+                res = await this.agent.actions.runAction('build:place', actionFn2, { timeout: 30 });
             }
             return res;
         }
         if (action.type === 'break') {
             const wp = action.worldPos;
-            console.log(`BuildController: directly breaking ${action.actual} at (${wp.x}, ${wp.y}, ${wp.z})`);
+            console.log(`BuildController: breaking ${action.actual} at (${wp.x}, ${wp.y}, ${wp.z})`);
             const actionFn = async () => {
-                await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 4);
+                await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 3);
                 await skills.breakBlockAt(this.bot, wp.x, wp.y, wp.z);
             };
             const res = await this.agent.actions.runAction('build:break', actionFn, { timeout: 30 });
