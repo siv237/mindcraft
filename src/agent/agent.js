@@ -230,9 +230,10 @@ export class Agent {
             let buildActive = this.build_controller.loadState();
             if (buildActive) {
                 const site = this.build_controller.buildSite;
+                await new Promise(r => setTimeout(r, 2000));
                 const blockAt = this.bot.blockAt(new Vec3(site.x, site.y, site.z));
-                if (!blockAt || blockAt.name === 'void_air' || site.y < -64) {
-                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void. Clearing stale build state for this world.`);
+                if (!blockAt || (blockAt.name === 'void_air' && site.y < -64)) {
+                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void (y=${site.y}). New world detected — clearing state.`);
                     this.build_controller.stop();
                     const { unlinkSync } = await import('fs');
                     try { unlinkSync(this.build_controller.stateFile); } catch {}

@@ -92,9 +92,17 @@ export class SelfPrompter {
                 } else if (action.done) {
                     this.build_controller.log(`BUILD COMPLETE: ${action.message}`);
                     this.agent.openChat(action.message);
-                    this.build_controller.stop();
-                    this.state = STOPPED;
-                    break;
+                    const next = this.build_controller.complete();
+                    if (next) {
+                        this.build_controller.log(`AUTO-RESUME next task: '${next.blueprintName}'`);
+                        this.prompt = `Building ${next.blueprintName} at (${next.buildSite.x}, ${next.buildSite.y}, ${next.buildSite.z})`;
+                        await new Promise(r => setTimeout(r, 2000));
+                        continue;
+                    } else {
+                        this.build_controller.stop();
+                        this.state = STOPPED;
+                        break;
+                    }
                 } else if (action.type === 'place' || action.type === 'break') {
                     directAction = action;
                     msg = action.message;

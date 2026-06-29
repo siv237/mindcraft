@@ -412,14 +412,16 @@ export const actionsList = [
                     return `Player '${near_player}' not found or too far away. Build at my position instead? Use !startBuild("${blueprint_name}").`;
                 }
             }
-            agent.build_controller.start(blueprint_name, position);
+            agent.build_controller.switchTo(blueprint_name, position);
             const progress = agent.build_controller.computeProgress();
             const site = agent.build_controller.buildSite;
+            const queueLen = agent.build_controller.queue.tasks.length;
             let msg = `Started building '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
-            msg += `Progress: ${progress.percent}%. The build controller will guide you step by step.`;
-            if (!agent.self_prompter.isActive()) {
-                agent.self_prompter.startBuildLoop(agent.build_controller);
+            msg += `Progress: ${progress.percent}%. Queue: ${queueLen} tasks.`;
+            if (agent.self_prompter.isActive()) {
+                await agent.self_prompter.stop(false);
             }
+            agent.self_prompter.startBuildLoop(agent.build_controller);
             return msg;
         }
     },
@@ -437,6 +439,8 @@ export const actionsList = [
             if (agent.build_controller.active) {
                 agent.build_controller.stop();
             }
+            agent.build_controller.queue.tasks = [];
+            agent.build_controller.queue.save();
             let position = null;
             if (near_player) {
                 const player = agent.bot.players[near_player];
@@ -458,6 +462,16 @@ export const actionsList = [
             }
             agent.self_prompter.startBuildLoop(agent.build_controller);
             return msg;
+        }
+    },
+    {
+        name: '!buildQueue',
+        description: 'Show all build tasks in the queue with their status and coordinates.',
+        perform: function (agent) {
+            if (!agent.build_controller) return 'No build controller.';
+            const queue = agent.build_controller.queue;
+            queue.load();
+            return queue.summary();
         }
     },
     {

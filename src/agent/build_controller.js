@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlink
 import * as world from './library/world.js';
 import * as skills from './library/skills.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
+import { BuildQueue } from './build_queue.js';
 
 const PHASES = ['tools', 'clearing', 'floor', 'walls', 'roof', 'details', 'done'];
 
@@ -10,13 +11,14 @@ export class BuildController {
     constructor(agent) {
         this.agent = agent;
         this.blueprint = null;
-        this.buildSite = null; // {x, y, z}
+        this.buildSite = null;
         this.phase = 'clearing';
         this.phaseIndex = 0;
         this.active = false;
         this.worldId = null;
         this.failCount = 0;
         this.lastAction = null;
+        this.queue = new BuildQueue(this);
     }
 
     get bot() {
@@ -119,10 +121,40 @@ export class BuildController {
         this.phaseIndex = 0;
         this.active = true;
         this.failCount = 0;
+        this.queue.load();
+        this.queue.addTask(name, this.buildSite);
         this.saveState();
         this.agent.memory_bank.rememberPlace('build_site',
             this.buildSite.x, this.buildSite.y, this.buildSite.z);
         this.log(`START build '${name}' at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
+    }
+
+    switchTo(blueprintName, position = null) {
+        if (this.active) {
+            this.log(`SWITCH: pausing '${this.blueprint?.name}' to start '${blueprintName}'`);
+            this.active = false;
+            this.saveState();
+        }
+        this.start(blueprintName, position);
+    }
+
+    complete() {
+        const completed = this.blueprint?.name || 'unknown';
+        this.log(`COMPLETE: '${completed}' finished`);
+        this.active = false;
+        this.saveState();
+        const next = this.queue.completeCurrent();
+        if (next) {
+            this.log(`AUTO-RESUME: starting next task '${next.blueprintName}'`);
+            this.loadBlueprint(next.blueprintName);
+            this.buildSite = next.buildSite;
+            this.phase = 'tools';
+            this.active = true;
+            this.failCount = 0;
+            this.saveState();
+            return next;
+        }
+        return null;
     }
 
     stop() {
