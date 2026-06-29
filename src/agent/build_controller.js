@@ -785,7 +785,12 @@ export class BuildController {
                 }
 
                 const smeltSource = REVERSE_SMELTING[resolvedName];
-                if (smeltSource && (inv[smeltSource] || 0) > 0) {
+                const hasFurnace = (inv['furnace'] || 0) > 0 ||
+                    world.getNearestBlock(this.bot, 'furnace', 16) !== null;
+                const hasFuel = (inv['coal'] || 0) > 0 || (inv['charcoal'] || 0) > 0 ||
+                    (inv['oak_log'] || 0) > 0 || (inv['oak_planks'] || 0) > 0 ||
+                    (inv['stick'] || 0) >= 2;
+                if (smeltSource && (inv[smeltSource] || 0) > 0 && hasFurnace && hasFuel) {
                     const missing = this.countMissingMaterials();
                     const haveRaw = inv[smeltSource] || 0;
                     const needCount = missing[resolvedName] || 1;
@@ -985,11 +990,6 @@ export class BuildController {
             };
             const res = await this.agent.actions.runAction('build:smelt', actionFn, { timeout: 120 });
             this.log(`SMELT result: ${res.message?.substring(0, 100)}`);
-            if (res.success !== false) {
-                setTimeout(() => {
-                    this.agent.cleanKill('Safely restarting after smelting to update inventory.');
-                }, 1000);
-            }
             return res;
         }
         return null;
@@ -1135,13 +1135,36 @@ export class BuildController {
         const plan = this.getMaterialPlan(resolvedName, totalNeeded, inv);
         const haveStr = plan.have > 0 ? ` (already have ${plan.have})` : '';
 
-        const firstCollectStep = plan.steps.find(s => s.includes('collectBlocks'));
-        const firstSmeltStep = plan.steps.find(s => s.includes('smeltItem'));
-        const firstCraftStep = plan.steps.find(s => s.includes('craftRecipe'));
+        const smeltSource = REVERSE_SMELTING[resolvedName];
+        const hasFurnace = (inv['furnace'] || 0) > 0 ||
+            world.getNearestBlock(this.bot, 'furnace', 16) !== null;
+        const hasFuel = (inv['coal'] || 0) > 0 || (inv['charcoal'] || 0) > 0 ||
+            (inv['oak_log'] || 0) > 0 || (inv['oak_planks'] || 0) > 0 ||
+            (inv['stick'] || 0) >= 2;
+
+        let extraSteps = [];
+        if (smeltSource && (inv[smeltSource] || 0) > 0 && !hasFurnace) {
+            if ((inv['cobblestone'] || 0) >= 8) {
+                extraSteps.push(`!craftRecipe("furnace", 1)  [craft furnace from 8 cobblestone]`);
+            } else {
+                extraSteps.push(`!collectBlocks("stone", 8)  [mine stone → cobblestone for furnace]`);
+                extraSteps.push(`!craftRecipe("furnace", 1)  [craft furnace from 8 cobblestone]`);
+            }
+        }
+        if (smeltSource && (inv[smeltSource] || 0) > 0 && !hasFuel) {
+            extraSteps.push(`!collectBlocks("oak_log", 4)  [fuel for furnace]`);
+        }
+
+        const allSteps = [...extraSteps, ...plan.steps];
+        const firstCollectStep = allSteps.find(s => s.includes('collectBlocks'));
+        const firstSmeltStep = allSteps.find(s => s.includes('smeltItem'));
+        const firstCraftStep = allSteps.find(s => s.includes('craftRecipe'));
 
         let nextStep = '';
         if (firstCollectStep) {
             nextStep = `NEXT ACTION: ${firstCollectStep}`;
+        } else if (firstCraftStep && extraSteps.length > 0) {
+            nextStep = `NEXT ACTION: ${firstCraftStep}`;
         } else if (firstSmeltStep) {
             nextStep = `NEXT ACTION: ${firstSmeltStep}`;
         } else if (firstCraftStep) {

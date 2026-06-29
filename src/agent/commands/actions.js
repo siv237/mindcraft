@@ -284,11 +284,7 @@ export const actionsList = [
         },
         perform: runAsAction(async (agent, item_name, num) => {
             let success = await skills.smeltItem(agent.bot, item_name, num);
-            if (success) {
-                setTimeout(() => {
-                    agent.cleanKill('Safely restarting to update inventory.');
-                }, 500);
-            }
+            return success ? `Smelted ${num} ${item_name}.` : `Failed to smelt ${item_name}.`;
         })
     },
     {
