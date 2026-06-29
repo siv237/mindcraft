@@ -263,12 +263,14 @@ export class BuildController {
         }
 
         if (this.phase === 'clearing') {
-            const hasWrongBlocks = this.findWrongBlocks().length > 0;
+            const wrong = this.findWrongBlocks();
             const floorComplete = this.isLevelComplete(0);
-            if (!floorComplete) {
+            if (wrong.length > 0 && !floorComplete) {
+                this.phase = 'clearing';
+            } else if (!floorComplete) {
                 if (oldPhase !== 'floor') this.log(`PHASE: ${oldPhase}→floor progress=${progress.percent}%`);
                 this.phase = 'floor';
-            } else if (hasWrongBlocks) {
+            } else if (wrong.length > 0) {
                 this.phase = 'clearing';
             } else {
                 this.log(`PHASE: ${oldPhase}→walls progress=${progress.percent}%`);
@@ -433,8 +435,47 @@ export class BuildController {
         };
     }
 
-    resolveBlockName(blueprintName) {
-        return getTypeOfGeneric(this.bot, blueprintName);
+    findClearableBlocks() {
+        const all = this.getAllBlocks();
+        const clearable = [];
+        for (const cell of all) {
+            const { current } = this.scanBlock(cell.x, cell.y, cell.z);
+            if (!current || current.name === 'air') continue;
+            if (!blockSatisfied(cell.blueprintBlock, current)) {
+                if (cell.blueprintBlock === 'air' && current.name !== 'air') {
+                    clearable.push({
+                        x: cell.x, y: cell.y, z: cell.z,
+                        expected: cell.blueprintBlock,
+                        actual: current.name,
+                        worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
+                    });
+                }
+            }
+        }
+        return clearable;
+    }
+
+    findSalvageBlocks(targetBlock) {
+        const resolvedTarget = this.resolveBlockName(targetBlock);
+        const all = this.getAllBlocks();
+        const salvage = [];
+        for (const cell of all) {
+            const { current } = this.scanBlock(cell.x, cell.y, cell.z);
+            if (!current || current.name === 'air') continue;
+            if (blockSatisfied(cell.blueprintBlock, current)) continue;
+            if (current.name === resolvedTarget ||
+                (resolvedTarget === 'oak_planks' && current.name === 'oak_planks') ||
+                (resolvedTarget === 'cobblestone' && current.name === 'cobblestone') ||
+                (resolvedTarget === 'stone_bricks' && current.name === 'stone_bricks')) {
+                salvage.push({
+                    x: cell.x, y: cell.y, z: cell.z,
+                    blueprintBlock: cell.blueprintBlock,
+                    actual: current.name,
+                    worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
+                });
+            }
+        }
+        return salvage;
     }
 
     countNeededMaterials() {
@@ -505,6 +546,20 @@ export class BuildController {
             }
         }
 
+        const clearable = this.findClearableBlocks();
+        if (clearable.length > 0 && !isCreative) {
+            const c = clearable[0];
+            this.log(`CLEAR: breaking ${c.actual} at (${c.worldPos.x},${c.worldPos.y},${c.worldPos.z}) — expected air`);
+            return {
+                type: 'break',
+                done: false,
+                worldPos: c.worldPos,
+                expected: 'air',
+                actual: c.actual,
+                message: this.formatClearAction(c, progress, posStr, siteStr),
+            };
+        }
+
         const missing = this.findMissingBlocks(1);
         if (missing.length > 0) {
             const m = missing[0];
@@ -528,6 +583,19 @@ export class BuildController {
                         this.phase = 'tools';
                         return this.getToolAction(inv, posStr, siteStr, progress);
                     }
+                }
+                const salvage = this.findSalvageBlocks(m.blueprintBlock);
+                if (salvage.length > 0) {
+                    const s = salvage[0];
+                    this.log(`SALVAGE: breaking ${s.actual} at (${s.worldPos.x},${s.worldPos.y},${s.worldPos.z}) to get materials for ${resolvedName}`);
+                    return {
+                        type: 'break',
+                        done: false,
+                        worldPos: s.worldPos,
+                        expected: s.blueprintBlock,
+                        actual: s.actual,
+                        message: this.formatSalvageAction(s, resolvedName, progress, posStr, siteStr),
+                    };
                 }
                 return {
                     type: 'gather',
@@ -621,6 +689,16 @@ export class BuildController {
             `Expected: ${w.expected}, found: ${w.actual}.\n` +
             `Remove it with !newAction("Break the block at ${wp.x} ${wp.y} ${wp.z} using skills.breakBlockAt"). ` +
             `Respond:`;
+    }
+
+    formatSalvageAction(s, resolvedName, progress, posStr, siteStr) {
+        const wp = s.worldPos;
+        return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
+            `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
+            `SALVAGE: You need ${resolvedName} but have 0 in inventory. ` +
+            `Found ${s.actual} block at (${wp.x}, ${wp.y}, ${wp.z}) that is in the way of the build. ` +
+            `Break it to clear the site and collect materials. ` +
+            `The build controller will break it automatically. Respond:`;
     }
 
     formatPlaceAction(m, resolvedName, progress, posStr, siteStr) {
