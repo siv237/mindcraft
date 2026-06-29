@@ -228,7 +228,7 @@ export class Agent {
                 const site = this.build_controller.buildSite;
                 const blockAt = this.bot.blockAt(new Vec3(site.x, site.y, site.z));
                 if (!blockAt || blockAt.name === 'void_air' || site.y < -64) {
-                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void — new world detected. Clearing old build state and memory.`);
+                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void. Clearing stale build state for this world.`);
                     this.build_controller.stop();
                     const { unlinkSync } = await import('fs');
                     try { unlinkSync(this.build_controller.stateFile); } catch {}
@@ -240,7 +240,7 @@ export class Agent {
                     save_data.self_prompting_state = 0;
                 }
             } else if (save_data.self_prompt && save_data.self_prompt.includes('Building')) {
-                console.log('self_prompt references old build but no build_state found. Clearing memory.');
+                console.log('self_prompt references old build but no build_state for this world. Clearing memory.');
                 this.history.clear();
                 this.history.memory = '';
                 this.memory_bank = new MemoryBank();
@@ -273,15 +273,20 @@ export class Agent {
         }
 
         if (!save_data?.self_prompt && settings.auto_goal) {
-            console.log(`Auto-starting with goal: ${settings.auto_goal}`);
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-            if (settings.auto_goal.startsWith('!startBuild')) {
-                const match = settings.auto_goal.match(/!startBuild\("?(\w+)"?\)/);
-                const blueprintName = match ? match[1] : 'house_5x5';
-                this.build_controller.start(blueprintName);
+            if (this.build_controller && this.build_controller.active) {
+                console.log(`Build already active for world ${this.build_controller.worldId} at (${this.build_controller.buildSite.x},${this.build_controller.buildSite.y},${this.build_controller.buildSite.z}). Resuming.`);
                 this.self_prompter.startBuildLoop(this.build_controller);
             } else {
-                this.self_prompter.start(settings.auto_goal);
+                console.log(`Auto-starting with goal: ${settings.auto_goal}`);
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+                if (settings.auto_goal.startsWith('!startBuild')) {
+                    const match = settings.auto_goal.match(/!startBuild\("?(\w+)"?\)/);
+                    const blueprintName = match ? match[1] : 'house_5x5';
+                    this.build_controller.start(blueprintName);
+                    this.self_prompter.startBuildLoop(this.build_controller);
+                } else {
+                    this.self_prompter.start(settings.auto_goal);
+                }
             }
         }
     }

@@ -371,6 +371,17 @@ export const actionsList = [
             if (!agent.build_controller) {
                 agent.build_controller = new BuildController(agent);
             }
+            const existing = agent.build_controller.loadState();
+            if (existing && agent.build_controller.active && agent.build_controller.blueprint?.name === blueprint_name) {
+                const progress = agent.build_controller.computeProgress();
+                const site = agent.build_controller.buildSite;
+                let msg = `Already building '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
+                msg += `Progress: ${progress.percent}%. Resuming.`;
+                if (!agent.self_prompter.isActive()) {
+                    agent.self_prompter.startBuildLoop(agent.build_controller);
+                }
+                return msg;
+            }
             agent.build_controller.start(blueprint_name);
             const progress = agent.build_controller.computeProgress();
             const site = agent.build_controller.buildSite;
@@ -379,6 +390,31 @@ export const actionsList = [
             if (!agent.self_prompter.isActive()) {
                 agent.self_prompter.startBuildLoop(agent.build_controller);
             }
+            return msg;
+        }
+    },
+    {
+        name: '!newBuild',
+        description: 'Start a NEW building at current position, abandoning any previous build.',
+        params: {
+            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5).' },
+        },
+        perform: async function (agent, blueprint_name) {
+            if (!agent.build_controller) {
+                agent.build_controller = new BuildController(agent);
+            }
+            if (agent.build_controller.active) {
+                agent.build_controller.stop();
+            }
+            agent.build_controller.start(blueprint_name);
+            const progress = agent.build_controller.computeProgress();
+            const site = agent.build_controller.buildSite;
+            let msg = `Started NEW build '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
+            msg += `Progress: ${progress.percent}%.`;
+            if (agent.self_prompter.isActive()) {
+                await agent.self_prompter.stop();
+            }
+            agent.self_prompter.startBuildLoop(agent.build_controller);
             return msg;
         }
     },

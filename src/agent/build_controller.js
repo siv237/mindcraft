@@ -1,5 +1,5 @@
 import { Vec3 } from 'vec3';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import * as world from './library/world.js';
 import * as skills from './library/skills.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
@@ -14,11 +14,27 @@ export class BuildController {
         this.phase = 'clearing';
         this.phaseIndex = 0;
         this.active = false;
-        this.stateFile = `./bots/${agent.name}/build_state.json`;
+        this.worldId = null;
+        this.statesDir = `./bots/${agent.name}/build_states`;
     }
 
     get bot() {
         return this.agent.bot;
+    }
+
+    getWorldId() {
+        if (this.worldId) return this.worldId;
+        const spawn = this.bot.spawnPoint;
+        const dim = this.bot.game?.dimension || 'minecraft:overworld';
+        const sx = spawn ? spawn.x : 0;
+        const sy = spawn ? spawn.y : 0;
+        const sz = spawn ? spawn.z : 0;
+        this.worldId = `${dim}_${sx}_${sy}_${sz}`;
+        return this.worldId;
+    }
+
+    get stateFile() {
+        return `${this.statesDir}/${this.getWorldId()}.json`;
     }
 
     loadBlueprint(name) {
@@ -429,14 +445,16 @@ export class BuildController {
 
     saveState() {
         try {
-            mkdirSync(`./bots/${this.agent.name}`, { recursive: true });
+            mkdirSync(this.statesDir, { recursive: true });
             const data = {
+                worldId: this.getWorldId(),
                 blueprintName: this.blueprint?.name || null,
                 buildSite: this.buildSite,
                 phase: this.phase,
                 active: this.active,
             };
             writeFileSync(this.stateFile, JSON.stringify(data, null, 2));
+            console.log(`Saved build state for world ${this.worldId}: ${data.blueprintName} at (${data.buildSite?.x},${data.buildSite?.y},${data.buildSite?.z})`);
         } catch (e) {
             console.error('Failed to save build state:', e);
         }
@@ -444,14 +462,19 @@ export class BuildController {
 
     loadState() {
         try {
-            if (!existsSync(this.stateFile)) return false;
-            const data = JSON.parse(readFileSync(this.stateFile, 'utf8'));
+            mkdirSync(this.statesDir, { recursive: true });
+            const file = this.stateFile;
+            if (!existsSync(file)) {
+                console.log(`No build state for world ${this.getWorldId()}. Starting fresh.`);
+                return false;
+            }
+            const data = JSON.parse(readFileSync(file, 'utf8'));
             if (!data.blueprintName || !data.buildSite) return false;
             this.loadBlueprint(data.blueprintName);
             this.buildSite = data.buildSite;
             this.phase = data.phase || 'clearing';
             this.active = data.active || false;
-            console.log(`Restored build state: ${data.blueprintName} at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}`);
+            console.log(`Restored build state for world ${this.worldId}: ${data.blueprintName} at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}`);
             return this.active;
         } catch (e) {
             console.error('Failed to load build state:', e);
