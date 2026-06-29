@@ -786,8 +786,9 @@ export class BuildController {
 
                 const smeltSource = REVERSE_SMELTING[resolvedName];
                 if (smeltSource && (inv[smeltSource] || 0) > 0) {
+                    const missing = this.countMissingMaterials();
                     const haveRaw = inv[smeltSource] || 0;
-                    const needCount = needed[resolvedName] || 1;
+                    const needCount = missing[resolvedName] || 1;
                     const smeltCount = Math.min(haveRaw, needCount);
                     this.log(`DIRECT SMELT: have ${haveRaw} ${smeltSource}, need ${needCount} ${resolvedName}, smelting ${smeltCount}`);
                     return {
