@@ -216,6 +216,12 @@ export class Agent {
         else {
             this.openChat("Hello world! I am "+this.name);
         }
+
+        if (!save_data?.self_prompt && settings.auto_goal) {
+            console.log(`Auto-starting self-prompting with goal: ${settings.auto_goal}`);
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            this.self_prompter.start(settings.auto_goal);
+        }
     }
 
     checkAllPlayersPresent() {
@@ -312,8 +318,10 @@ export class Agent {
         await this.history.add(source, message);
         this.history.save();
 
-        if (!self_prompt && this.self_prompter.isActive()) // message is from user during self-prompting
+        if (!self_prompt && this.self_prompter.isActive()) {
+            await this.self_prompter.pause();
             max_responses = 1; // force only respond to this message, then let self-prompting take over
+        }
         for (let i=0; i<max_responses; i++) {
             if (checkInterrupt()) break;
             let history = this.history.getHistory();
@@ -376,6 +384,15 @@ export class Agent {
             }
             
             this.history.save();
+        }
+
+        if (this.self_prompter.isPaused() && !convoManager.inConversation()) {
+            setTimeout(() => {
+                if (this.self_prompter.isPaused() && !convoManager.inConversation()) {
+                    console.log('Resuming self-prompting after player interaction...');
+                    this.self_prompter.start();
+                }
+            }, 3000);
         }
 
         return used_command;

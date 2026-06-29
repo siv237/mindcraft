@@ -50,10 +50,18 @@ export class Examples {
         let turn_text = this.turnsToText(turns);
         if (this.model !== null) {
             let embedding = await this.model.embed(turn_text);
-            this.examples.sort((a, b) => 
-                cosineSimilarity(embedding, this.embeddings[this.turnsToText(b)]) -
-                cosineSimilarity(embedding, this.embeddings[this.turnsToText(a)])
-            );
+            if (embedding === null) {
+                console.warn('Embedding returned null, using word-overlap instead.');
+                this.examples.sort((a, b) => 
+                    wordOverlapScore(turn_text, this.turnsToText(b)) -
+                    wordOverlapScore(turn_text, this.turnsToText(a))
+                );
+            } else {
+                this.examples.sort((a, b) => 
+                    cosineSimilarity(embedding, this.embeddings[this.turnsToText(b)]) -
+                    cosineSimilarity(embedding, this.embeddings[this.turnsToText(a)])
+                );
+            }
         }
         else {
             this.examples.sort((a, b) => 

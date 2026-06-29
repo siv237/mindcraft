@@ -1,16 +1,16 @@
 const settings = {
     "minecraft_version": "auto", // or specific version like "1.21.6"
-    "host": "127.0.0.1", // or "localhost", "your.ip.address.here"
-    "port": 55916, // set to -1 to automatically scan for open ports
+    "host": "192.168.237.187", // or "localhost", "your.ip.address.here"
+    "port": 6666, // set to -1 to automatically scan for open ports
     "auth": "offline", // or "microsoft"
 
     // the mindserver manages all agents and hosts the UI
     "mindserver_port": 8080,
-    "auto_open_ui": true, // opens UI in browser on startup
+    "auto_open_ui": false, // opens UI in browser on startup
     
-    "base_profile": "assistant", // survival, assistant, creative, or god_mode
+    "base_profile": "survival", // survival, assistant, creative, or god_mode
     "profiles": [
-        "./andy.json",
+        "./profiles/ollama-andy4.json",
         // "./profiles/gpt.json",
         // "./profiles/claude.json",
         // "./profiles/gemini.json",
@@ -26,8 +26,9 @@ const settings = {
         // individual profiles override values from the base profile
     ],
 
-    "load_memory": false, // load memory from previous session
+    "load_memory": true, // load memory from previous session
     "init_message": "Respond with hello world and your name", // sends to all on spawn
+    "auto_goal": "You are building a 5x5 oak house. Follow these steps IN ORDER. Always return to this plan after any interruption. Step 0: Save your build location with !rememberHere(\"build_site\"). Step 1: Check inventory with !inventory. Step 2: If you have less than 30 oak_log, collect them with !collectBlocks(\"oak_log\", 30). Step 3: Craft oak_planks with !craftRecipe(\"oak_planks\", 25). Step 4: Craft sticks with !craftRecipe(\"stick\", 4). Step 5: Craft oak_door with !craftRecipe(\"oak_door\", 1). Step 6: Return to build site with !goToRememberedPlace(\"build_site\"). Step 7: Build the house with !newAction(\"Build a 5x5 house: place 5x5 oak_planks floor at bot position, then 3-high walls with door gap at front center, then 5x5 oak_planks roof on top\"). Step 8: After building, go to build_site and use !newAction(\"Check the area: look at blocks around bot position, if any floor/wall/roof blocks are missing, place them with skills.placeBlock\"). Step 9: Repeat step 8 until all blocks are placed correctly: 5x5 floor, 3-high walls on all 4 sides, 5x5 roof. Step 10: If any step fails, go back and gather more materials. NEVER give up. NEVER use !endGoal or !stop. Always continue until the house is fully built and verified.",
     "only_chat_with": [], // users that the bots listen to and send general messages to. if empty it will chat publicly
 
     "speak": false,
@@ -37,12 +38,12 @@ const settings = {
     // Works on windows and mac, but linux requires you to install the espeak package through your package manager eg: `apt install espeak` `pacman -S espeak`.
 
     "chat_ingame": true, // bot responses are shown in minecraft chat
-    "language": "en", // translate to/from this language. Supports these language names: https://cloud.google.com/translate/docs/languages
+    "language": "ru", // translate to/from this language. Supports these language names: https://cloud.google.com/translate/docs/languages
     "render_bot_view": false, // show bot's view in browser at localhost:3000, 3001...
 
-    "allow_insecure_coding": false, // allows newAction command and model can write/run code on your computer. enable at own risk
+    "allow_insecure_coding": true, // allows newAction command and model can write/run code on your computer. enable at own risk
     "allow_vision": false, // allows vision model to interpret screenshots as inputs
-    "blocked_actions" : ["!checkBlueprint", "!checkBlueprintLevel", "!getBlueprint", "!getBlueprintLevel"] , // commands to disable and remove from docs. Ex: ["!setMode"]
+    "blocked_actions" : ["!endGoal", "!stop"],
     "code_timeout_mins": -1, // minutes code is allowed to run. -1 for no timeout
     "relevant_docs_count": 5, // number of relevant code function docs to select for prompting. -1 for all
 

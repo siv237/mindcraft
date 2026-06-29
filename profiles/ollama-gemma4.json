@@ -1,0 +1,17 @@
+{
+    "name": "Andy",
+
+    "cooldown": 3000,
+
+    "model": {
+        "api": "ollama",
+        "model": "sweaterdog/andy-4:latest",
+        "url": "http://192.168.237.187:11434"
+    },
+
+    "embedding": {
+        "api": "ollama",
+        "url": "http://192.168.237.187:11434",
+        "model": "nomic-embed-text"
+    }
+}

@@ -1,0 +1,204 @@
+{
+  "simple_house": {
+    "type": "construction",
+    "goal": "Build a simple 5x5 oak house with walls and roof",
+    "conversation": "Build a simple house",
+    "agent_count": 1,
+    "timeout": 600,
+    "initial_inventory": {
+      "0": {
+        "oak_planks": 100,
+        "oak_door": 2,
+        "stone_axe": 1
+      }
+    },
+    "blueprint": {
+      "materials": {
+        "oak_planks": 97,
+        "oak_door": 2
+      },
+      "levels": [
+        {
+          "level": 0,
+          "coordinates": [
+            0,
+            -60,
+            0
+          ],
+          "placement": [
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ]
+          ]
+        },
+        {
+          "level": 1,
+          "coordinates": [
+            0,
+            -59,
+            0
+          ],
+          "placement": [
+            [
+              "oak_planks",
+              "oak_planks",
+              "air",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ]
+          ]
+        },
+        {
+          "level": 2,
+          "coordinates": [
+            0,
+            -58,
+            0
+          ],
+          "placement": [
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "air",
+              "air",
+              "air",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ]
+          ]
+        },
+        {
+          "level": 3,
+          "coordinates": [
+            0,
+            -57,
+            0
+          ],
+          "placement": [
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ],
+            [
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks",
+              "oak_planks"
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

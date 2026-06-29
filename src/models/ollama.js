@@ -30,7 +30,10 @@ export class Ollama {
                     ...(this.params || {})
                 });
                 if (apiResponse) {
-                    res = apiResponse['message']['content'];
+                    res = apiResponse['message']['content'] || '';
+                    if (!res && apiResponse['message']['thinking']) {
+                        res = apiResponse['message']['thinking'];
+                    }
                 } else {
                     res = 'No response data.';
                 }
@@ -70,9 +73,15 @@ export class Ollama {
 
     async embed(text) {
         let model = this.model_name || 'embeddinggemma';
-        let body = { model: model, input: text };
+        let body = { model: model, prompt: text };
         let res = await this.send(this.embedding_endpoint, body);
-        return res['embedding'];
+        if (res && res['embedding']) {
+            return res['embedding'];
+        }
+        if (res && res['embeddings'] && res['embeddings'].length > 0) {
+            return res['embeddings'][0];
+        }
+        return null;
     }
 
     async send(endpoint, body) {

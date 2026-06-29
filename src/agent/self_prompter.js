@@ -61,9 +61,11 @@ export class SelfPrompter {
         console.log('starting self-prompt loop')
         this.loop_active = true;
         let no_command_count = 0;
-        const MAX_NO_COMMAND = 3;
+        const MAX_NO_COMMAND = 10;
         while (!this.interrupt) {
-            const msg = `You are self-prompting with the goal: '${this.prompt}'. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
+            const pos = this.agent.bot.entity.position;
+            const posStr = `x:${Math.floor(pos.x)}, y:${Math.floor(pos.y)}, z:${Math.floor(pos.z)}`;
+            const msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Check your inventory with !inventory if needed. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
             
             let used_command = await this.agent.handleMessage('system', msg, -1);
             if (!used_command) {
