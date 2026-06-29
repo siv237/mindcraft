@@ -557,7 +557,7 @@ export class BuildController {
             }
         }
         if (needPickaxe) {
-            if (haveCobblestone > 0 && havePlanks >= 3 && haveSticks >= 2) {
+            if (haveCobblestone > 0 && havePlanks >= 3 && haveSticks >= 2 && hasAxe) {
                 steps.push(`Craft stone pickaxe: !craftRecipe("stone_pickaxe", 1)`);
             } else if (havePlanks >= 3 && haveSticks >= 2) {
                 steps.push(`Craft wooden pickaxe: !craftRecipe("wooden_pickaxe", 1)`);
