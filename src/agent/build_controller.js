@@ -130,8 +130,24 @@ export class BuildController {
     }
 
     switchTo(blueprintName, position = null) {
-        if (this.active) {
-            this.log(`SWITCH: pausing '${this.blueprint?.name}' to start '${blueprintName}'`);
+        if (this.active && this.blueprint && this.buildSite) {
+            this.log(`SWITCH: pausing '${this.blueprint.name}' to start '${blueprintName}'`);
+            this.queue.load();
+            const existing = this.queue.tasks.find(t =>
+                t.blueprintName === this.blueprint.name &&
+                t.buildSite.x === this.buildSite.x &&
+                t.buildSite.y === this.buildSite.y &&
+                t.buildSite.z === this.buildSite.z
+            );
+            if (!existing) {
+                this.queue.addTask(this.blueprint.name, this.buildSite);
+                const justAdded = this.queue.getCurrent();
+                if (justAdded) justAdded.status = 'paused';
+                this.queue.save();
+            } else {
+                existing.status = 'paused';
+                this.queue.save();
+            }
             this.active = false;
             this.saveState();
         }

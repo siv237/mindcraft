@@ -27,7 +27,7 @@ const settings = {
     ],
 
     "load_memory": true, // load memory from previous session
-    "init_message": "Respond with hello world and your name. Available blueprints: house_5x5, stone_brick_house, farm_hut, storage_shed, cobblestone_tower, watchtower, lighthouse, wall_7x7, bridge. Use !listBlueprints for details. When a player asks to build something, use !startBuild(\"blueprint_name\", \"player_name\") to build near them.",
+    "init_message": "Respond with hello world and your name",
     "auto_goal": "!startBuild(\"house_5x5\")", // starts build controller with blueprint
     "only_chat_with": [], // users that the bots listen to and send general messages to. if empty it will chat publicly
 
