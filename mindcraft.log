@@ -49129,3 +49129,1977 @@ Andy full response to system: ""Placing a crafting table! !placeHere""
 Agent executed: !placeHere and got: Command !placeHere was given 0 args, but requires 1-1 args.
 [BC] CMD !placeHere result: Command !placeHere was given 0 args, but requires 1-1 args.
 Saved memory to: ./bots/Andy/memory.json
+selected examples:
+Example: You are self-prompting with the goal: "Get a wooden pickaxe". Respond:
+Example: work together with the other bot to build a house
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: Crafting the stone pickaxe! !craftRecipe("stone_pickaxe", 1)
+[BC] LLM_RESPONSE to system: "Crafting the stone pickaxe! !craftRecipe("stone_pickaxe", 1)"
+Andy full response to system: ""Crafting the stone pickaxe! !craftRecipe("stone_pickaxe", 1)""
+Storing memories...
+parsed command: { commandName: '!craftRecipe', args: [ 'stone_pickaxe', 1 ] }
+executing code...
+
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Memory updated to:  Координаты build_site: (99, 112, 3). Прогресс строительства башни маяка: 90% (этап стен, выполнено 314 из 350 блоков). Проблемы с выплавкой песка на координатах (108, 113, 7) продолжаются. Автоматическое размещение блоков идет по графиру. В процессе добычи и выплавки материалов для завершения строительства.
+crafting...
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Agent executed: !craftRecipe and got: Action output:
+Placed crafting_table at (97, 105, 1).
+Successfully crafted stone_pickaxe, you now have 1 stone_pickaxe.
+Collected 1 crafting_table.
+
+[BC] CMD !craftRecipe result: Action output:
+Placed crafting_table at (97, 105, 1).
+Successfully crafted stone_pickaxe, you now have 1 stone_pickaxe.
+Collected 1 crafting_table.
+
+Saved memory to: ./bots/Andy/memory.json
+selected examples:
+Example: You are self-prompting with the goal: "Get a wooden pickaxe". Respond:
+Example: bobby: Craft a plank
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: Great progress! Stone pickaxe crafted successfully. !checkBlueprintLevel(2)
+[BC] LLM_RESPONSE to system: "Great progress! Stone pickaxe crafted successfully. !checkBlueprintLevel(2)"
+Andy full response to system: ""Great progress! Stone pickaxe crafted successfully. !checkBlueprintLevel(2)""
+parsed command: { commandName: '!checkBlueprintLevel', args: [ 2 ] }
+Agent executed: !checkBlueprintLevel and got: No blueprint task active. Use !checkBuild to check build controller progress.
+[BC] CMD !checkBlueprintLevel result: No blueprint task active. Use !checkBuild to check build controller progress.
+Saved memory to: ./bots/Andy/memory.json
+selected examples:
+Example: You are self-prompting with the goal: "Get a wooden pickaxe". Respond:
+Example: bobby: Craft a plank
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: No active build task? Let me check the build progress directly. !checkBuild
+[BC] LLM_RESPONSE to system: "No active build task? Let me check the build progress directly. !checkBuild"
+Andy full response to system: ""No active build task? Let me check the build progress directly. !checkBuild""
+parsed command: { commandName: '!checkBuild', args: [] }
+[BC] PHASE: tools→clearing (tools ready)
+[BC] PHASE: tools→walls progress=90%
+Agent executed: !checkBuild and got: Build: 90% (314/350), phase: walls, wrong: 1. Inventory: 28x stick, 1x stone_pickaxe, 24x gravel, 1x apple, 32x oak_sapling, 87x leaf_litter, 14x oak_planks, 1x furnace, 9x oak_log, 17x sand, 2x flint, 22x cobblestone, 14x dirt, 1x stone_axe, 2x coal, 1x oak_door, 2x crafting_table, 2x raw_iron. Next: torch at (101,123,5). Follow the build controller instructions. Craft or gather as instructed.
+[BC] CMD !checkBuild result: Build: 90% (314/350), phase: walls, wrong: 1. Inventory: 28x stick, 1x stone_pickaxe, 24x gravel, 1x apple, 32x oak_sapling, 87x leaf_litter, 14x oak_planks, 1x furnace, 9x oak_log, 17x sand, 2x flint
+Storing memories...
+Saved memory to: ./bots/Andy/memory.json
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+selected examples:
+Example: work together with the other bot to build a house
+Example: trixy88: craft some sticks
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Memory updated to:  Координаты build_site: (99, 112, 3). Прогресс строительства башни маяка: 90% (этап инструментов, выполнено 314 из 350 блоков). Проблемы с добычей угля на координатах (108, 113, 7) и нехваткой инструментов продолжаются. Автоматическое размещение блоков приостановлено до создания кирки. В процессе добычи материалов для завершения строительства.
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: On it! Crafting torches now. !craftRecipe("torch", 4)
+[BC] LLM_RESPONSE to system: "On it! Crafting torches now. !craftRecipe("torch", 4)"
+Andy full response to system: ""On it! Crafting torches now. !craftRecipe("torch", 4)""
+parsed command: { commandName: '!craftRecipe', args: [ 'torch', 4 ] }
+executing code...
+
+crafting...
+Agent executed: !craftRecipe and got: Action output:
+Not enough coal to craft 4, crafted 2. You now have 8 torch.
+
+[BC] CMD !craftRecipe result: Action output:
+Not enough coal to craft 4, crafted 2. You now have 8 torch.
+
+Saved memory to: ./bots/Andy/memory.json
+stopping self-prompt loop
+executing code...
+
+selected examples:
+Example: trixy88: craft some sticks
+Example: work together with the other bot to build a house
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (97, 105, 1).
+
+Generated response: Got more coal from the nearby ore! !collectBlocks("coal_ore", 1)
+[BC] LLM_RESPONSE to system: "Got more coal from the nearby ore! !collectBlocks("coal_ore", 1)"
+Andy full response to system: ""Got more coal from the nearby ore! !collectBlocks("coal_ore", 1)""
+[BC] LLM→COMMAND used_command=true pos=x:97, y:105, z:1 inv={1x stone_pickaxe, 24x gravel, 1x apple, 32x oak_sapling, 87x leaf_litter, 14x oak_planks, 26x stick, 1x furnace, 9x oak_log, 17x sand, 2x flint, 22x cobblestone, 14x dirt, 1x stone_axe, 7x torch, 1x oak_door, 2x crafting_table, 2x raw_iron}
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+self prompt loop stopped
+Restarting self-prompting...
+starting self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] VERIFY: 2 blocks verified around (101,123,5)
+[BC] BATCH: placed 1 blocks, 0 failed
+stopping self-prompt loop
+executing code...
+
+Mode torch_placing finished executing, code_return: Action output:
+Cannot place torch at (101, 119, 5): nothing to place on.
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+self prompt loop stopped
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (101,112,5) — expected air
+[BC] BREAK dirt at (101,112,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,112,5)
+[BC] CLEAR: breaking dirt at (101,113,5) — expected air
+[BC] BREAK dirt at (101,113,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,113,5)
+[BC] CLEAR: breaking dirt at (101,114,5) — expected air
+[BC] BREAK dirt at (101,114,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,114,5)
+[BC] CLEAR: breaking dirt at (101,115,5) — expected air
+[BC] BREAK dirt at (101,115,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,115,5)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Found non-destructive path.
+Found non-destructive path.
+Picked up 3 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (101,116,5) — expected air
+[BC] BREAK dirt at (101,116,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,116,5)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking dirt at (101,117,4) — expected air
+[BC] BREAK dirt at (101,117,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,117,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+stopping self-prompt loop
+executing code...
+
+Mode torch_placing finished executing, code_return: Action output:
+Failed to place torch at (99, 112, 6).
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (101,112,4) — expected air
+[BC] BREAK dirt at (101,112,4) expected=air
+executing code...
+
+[BC] BREAK OK at (101,112,4)
+[BC] CLEAR: breaking dirt at (101,117,5) — expected air
+[BC] BREAK dirt at (101,117,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,117,5)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Found non-destructive path.
+Picked up 1 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (101,112,5) — expected air
+[BC] BREAK dirt at (101,112,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,112,5)
+[BC] PROMPT→LLM type=gather pos=x:101, y:112, z:5: BUILD PROGRESS: 90% (314/350). Phase: walls. Build site: (99, 112, 3). Your position: x:101, y:112, z:5.
+MATERIALS NEEDED: 4x glass, 24x cobblestone, 3x torch.
+You need 4x glass. All materials gathered.
+NEXT ACTION: !smeltItem("sand", 4)  [4 sand → 4 glass in furnace, repeat 1x]
+IMPORTANT: Do the NE
+received message from system : BUILD PROGRESS: 90% (314/350). Phase: walls. Build site: (99, 112, 3). Your position: x:101, y:112, z:5.
+MATERIALS NEEDED: 4x glass, 24x cobblestone, 3x torch.
+You need 4x glass. All materials gathered.
+NEXT ACTION: !smeltItem("sand", 4)  [4 sand → 4 glass in furnace, repeat 1x]
+IMPORTANT: Do the NEXT ACTION above. Do NOT use !placeHere, !newAction, or !discard. Do NOT try to craft items that have no recipe (glass, sand). The build controller will place blocks automatically. Respond:
+Saved memory to: ./bots/Andy/memory.json
+selected examples:
+Example: trixy88: craft some sticks
+Example: work together with the other bot to build a house
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+stopping self-prompt loop
+executing code...
+
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: Smelting the glass now! !smeltItem("sand", 4)
+[BC] LLM_RESPONSE to system: "Smelting the glass now! !smeltItem("sand", 4)"
+Andy full response to system: ""Smelting the glass now! !smeltItem("sand", 4)""
+Storing memories...
+[BC] LLM→NO_COMMAND pos=x:101, y:112, z:5 no_command_count=1
+self prompt loop stopped
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+Restarting self-prompting...
+starting self-prompt loop
+[BC] PROMPT→LLM type=gather pos=x:101, y:112, z:5: BUILD PROGRESS: 90% (314/350). Phase: walls. Build site: (99, 112, 3). Your position: x:101, y:112, z:5.
+MATERIALS NEEDED: 4x glass, 24x cobblestone, 3x torch.
+You need 4x glass. All materials gathered.
+NEXT ACTION: !smeltItem("sand", 4)  [4 sand → 4 glass in furnace, repeat 1x]
+IMPORTANT: Do the NE
+received message from system : BUILD PROGRESS: 90% (314/350). Phase: walls. Build site: (99, 112, 3). Your position: x:101, y:112, z:5.
+MATERIALS NEEDED: 4x glass, 24x cobblestone, 3x torch.
+You need 4x glass. All materials gathered.
+NEXT ACTION: !smeltItem("sand", 4)  [4 sand → 4 glass in furnace, repeat 1x]
+IMPORTANT: Do the NEXT ACTION above. Do NOT use !placeHere, !newAction, or !discard. Do NOT try to craft items that have no recipe (glass, sand). The build controller will place blocks automatically. Respond:
+Saved memory to: ./bots/Andy/memory.json
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Memory updated to:  Координаты build_site: (99, 112, 3). Прогресс строительства башни маяка: 85% (этап инструментов). Успешно раз安置ил стол для крафта и выковал каменную кирку на координатах (97, 105, 1). Добыча угля на (108, 113, 7) и проблема с инвентарем продолжаются. Автоматическое строительство возобновлено после создания кирки для продолжения строительства.
+selected examples:
+Example: work together with the other bot to build a house
+Example: You are self-prompting with the goal: "Get a wooden pickaxe". Respond:
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: Smelting the glass now! !smeltItem("sand", 4)
+[BC] LLM_RESPONSE to system: "Smelting the glass now! !smeltItem("sand", 4)"
+Andy full response to system: ""Smelting the glass now! !smeltItem("sand", 4)""
+parsed command: { commandName: '!smeltItem', args: [ 'sand', 4 ] }
+executing code...
+
+smelting...
+Added 3 oak_planks to furnace fuel.
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] REGISTER furnace at (102,112,5) — 1 items, status: has_items
+[BC] SMELT OK: sand x4 at furnace (102,112,5), ready at 2026-06-29T08:45:33.952Z
+Unpausing mode unstuck
+Agent executed: !smeltItem and got: Action output:
+Using oak_planks as fuel.
+Added 3 oak_planks to furnace fuel.
+Successfully smelted sand, got 4 glass.
+
+[BC] CMD !smeltItem result: Action output:
+Using oak_planks as fuel.
+Added 3 oak_planks to furnace fuel.
+Successfully smelted sand, got 4 glass.
+
+Saved memory to: ./bots/Andy/memory.json
+selected examples:
+Example: You are self-prompting with the goal: "Get a wooden pickaxe". Respond:
+Example: work together with the other bot to build a house
+Awaiting local response... (model: hf.co/Mindcraft-CE/Andy-4.2-Air-GGUF:Q4_K_M, attempt: 1)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Generated response: Got the glass! Time to keep building. !
+[BC] LLM_RESPONSE to system: "Got the glass! Time to keep building. !"
+Andy full response to system: ""Got the glass! Time to keep building. !""
+[BC] LLM→COMMAND used_command=true pos=x:101, y:112, z:5 inv={11x oak_planks, 7x torch, 24x gravel, 1x apple, 32x oak_sapling, 87x leaf_litter, 13x sand, 26x stick, 1x furnace, 9x oak_log, 4x glass, 2x flint, 22x cobblestone, 9x dirt, 1x stone_axe, 1x stone_pickaxe, 1x oak_door, 2x crafting_table, 2x raw_iron}
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] VERIFY: 2 blocks verified around (99,123,6)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] VERIFY: 1 blocks verified around (100,123,7)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] VERIFY: 1 blocks verified around (101,123,7)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BATCH PLACE FAILED glass at (102,123,7): Action output:
+Found non-destructive path.
+You have reached at 102, 123, 7.
+Fail
+[BC] BATCH: placed 3 blocks, 1 failed
+[BC] CLEAR: breaking dirt at (99,112,6) — expected air
+[BC] BREAK dirt at (99,112,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,6)
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,113,6)
+[BC] CLEAR: breaking dirt at (99,114,6) — expected air
+[BC] BREAK dirt at (99,114,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,114,6)
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,113,6)
+[BC] CLEAR: breaking dirt at (99,114,6) — expected air
+[BC] BREAK dirt at (99,114,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,114,6)
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking dirt at (99,115,6) — expected air
+[BC] BREAK dirt at (99,115,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,115,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,6)
+stopping self-prompt loop
+executing code...
+
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,115,6) — expected air
+[BC] BREAK dirt at (99,115,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,115,6)
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,113,6)
+[BC] CLEAR: breaking dirt at (99,115,6) — expected air
+[BC] BREAK dirt at (99,115,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,6)
+[BC] CLEAR: breaking dirt at (99,116,6) — expected air
+[BC] BREAK dirt at (99,116,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,116,6)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (99, 112, 6).
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking torch at (99,112,6) — expected air
+[BC] BREAK torch at (99,112,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,112,6)
+[BC] CLEAR: breaking dirt at (99,115,6) — expected air
+[BC] BREAK dirt at (99,115,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,6)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,117,6) — expected air
+[BC] BREAK dirt at (99,117,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,117,6)
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (99, 113, 6).
+
+self prompt loop stopped
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,112,6) — expected air
+[BC] BREAK dirt at (99,112,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,112,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking torch at (99,113,6) — expected air
+[BC] BREAK torch at (99,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,6)
+[BC] CLEAR: breaking dirt at (99,118,6) — expected air
+[BC] BREAK dirt at (99,118,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,118,6)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (98, 112, 6).
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,113,6) — expected air
+[BC] BREAK dirt at (99,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,6)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] VERIFY: 1 blocks verified around (99,123,7)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BATCH PLACE FAILED cobblestone at (103,123,7): Action output:
+Found non-destructive path.
+You have reached at 103, 123, 7.
+Fail
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+stopping self-prompt loop
+executing code...
+
+action "mode:unstuck" trying to interrupt current action "build:place"
+waiting for code to finish executing...
+waiting for code to finish executing...
+waiting for code to finish executing...
+Code execution triggered catch: PathStopped: Path was stopped before it could be completed! Thus, the desired goal was not reached.
+    at error (/root/mindcraft/node_modules/mineflayer-pathfinder/lib/goto.js:2:15)
+    at EventEmitter.pathStopped (/root/mindcraft/node_modules/mineflayer-pathfinder/lib/goto.js:39:15)
+    at EventEmitter.emit (node:events:524:28)
+    at stop (/root/mindcraft/node_modules/mineflayer-pathfinder/index.js:409:9)
+    at EventEmitter.monitorMovement (/root/mindcraft/node_modules/mineflayer-pathfinder/index.js:603:9)
+    at EventEmitter.emit (node:events:536:35)
+    at tickPhysics (/root/mindcraft/node_modules/mineflayer/lib/plugins/physics.js:83:11)
+    at Timeout.doPhysics [as _onTimeout] (/root/mindcraft/node_modules/mineflayer/lib/plugins/physics.js:71:7)
+    at listOnTimeout (node:internal/timers:581:17)
+    at process.processTimers (node:internal/timers:519:7)
+PathStopped: Path was stopped before it could be completed! Thus, the desired goal was not reached.
+    at error (/root/mindcraft/node_modules/mineflayer-pathfinder/lib/goto.js:2:15)
+    at EventEmitter.pathStopped (/root/mindcraft/node_modules/mineflayer-pathfinder/lib/goto.js:39:15)
+    at EventEmitter.emit (node:events:524:28)
+    at stop (/root/mindcraft/node_modules/mineflayer-pathfinder/index.js:409:9)
+    at EventEmitter.monitorMovement (/root/mindcraft/node_modules/mineflayer-pathfinder/index.js:603:9)
+    at EventEmitter.emit (node:events:536:35)
+    at tickPhysics (/root/mindcraft/node_modules/mineflayer/lib/plugins/physics.js:83:11)
+    at Timeout.doPhysics [as _onTimeout] (/root/mindcraft/node_modules/mineflayer/lib/plugins/physics.js:71:7)
+    at listOnTimeout (node:internal/timers:581:17)
+    at process.processTimers (node:internal/timers:519:7)
+[BC] BATCH PLACE FAILED cobblestone at (103,124,3): !!Code threw exception!!
+Error: PathStopped: Path was stopped before it could be
+executing code...
+
+waiting for code to finish executing...
+waiting for code to finish executing...
+waiting for code to finish executing...
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+waiting for code to finish executing...
+executing code...
+
+waiting for code to finish executing...
+waiting for code to finish executing...
+waiting for code to finish executing...
+waiting for code to finish executing...
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BATCH: placed 7 blocks, 2 failed
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode unstuck finished executing, code_return: Action output:
+Found non-destructive path.
+Moved away from (100, 120, 4) to (98, 119, 9).
+
+stopping self-prompt loop
+executing code...
+
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (98, 118, 9).
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (99,112,4) — expected air
+[BC] BREAK cobblestone at (99,112,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking dirt at (100,112,5) — expected air
+[BC] BREAK dirt at (100,112,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,112,5)
+[BC] CLEAR: breaking cobblestone at (99,113,4) — expected air
+[BC] BREAK cobblestone at (99,113,4) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,4)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode torch_placing finished executing, code_return: Action output:
+Placed torch at (98, 112, 5).
+
+stopping self-prompt loop
+executing code...
+
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (99,114,4) — expected air
+[BC] BREAK cobblestone at (99,114,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,114,4)
+[BC] CLEAR: breaking cobblestone at (99,115,4) — expected air
+[BC] BREAK cobblestone at (99,115,4) expected=air
+executing code...
+
+[BC] BREAK OK at (99,115,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,116,4) — expected air
+[BC] BREAK cobblestone at (99,116,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,116,4)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 1 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,112,4) — expected air
+[BC] BREAK dirt at (99,112,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,4)
+[BC] CLEAR: breaking cobblestone at (99,113,4) — expected air
+[BC] BREAK cobblestone at (99,113,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,113,4)
+[BC] CLEAR: breaking cobblestone at (99,117,4) — expected air
+[BC] BREAK cobblestone at (99,117,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,117,4)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 1 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking grass_block at (99,112,4) — expected air
+[BC] BREAK grass_block at (99,112,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,113,4) — expected air
+[BC] BREAK cobblestone at (99,113,4) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,4)
+[BC] CLEAR: breaking cobblestone at (99,114,4) — expected air
+[BC] BREAK cobblestone at (99,114,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,114,4)
+[BC] CLEAR: breaking cobblestone at (99,115,4) — expected air
+[BC] BREAK cobblestone at (99,115,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,4)
+[BC] CLEAR: breaking cobblestone at (99,115,5) — expected air
+[BC] BREAK cobblestone at (99,115,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,5)
+[BC] CLEAR: breaking cobblestone at (99,118,4) — expected air
+[BC] BREAK cobblestone at (99,118,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,118,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 1 items.
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (99,112,4) — expected air
+[BC] BREAK dirt at (99,112,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,113,4) — expected air
+[BC] BREAK cobblestone at (99,113,4) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,114,4) — expected air
+[BC] BREAK cobblestone at (99,114,4) expected=air
+executing code...
+
+[BC] BREAK OK at (99,114,4)
+[BC] CLEAR: breaking cobblestone at (99,115,4) — expected air
+[BC] BREAK cobblestone at (99,115,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,4)
+[BC] CLEAR: breaking cobblestone at (99,115,5) — expected air
+[BC] BREAK cobblestone at (99,115,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,115,5)
+[BC] CLEAR: breaking cobblestone at (99,118,6) — expected air
+[BC] BREAK cobblestone at (99,118,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,118,6)
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+self prompt loop stopped
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (99,112,6) — expected air
+[BC] BREAK cobblestone at (99,112,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,6)
+[BC] CLEAR: breaking dirt at (100,112,6) — expected air
+[BC] BREAK dirt at (100,112,6) expected=air
+executing code...
+
+[BC] BREAK OK at (100,112,6)
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Found non-destructive path.
+Picked up 2 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (99,113,6) — expected air
+[BC] BREAK cobblestone at (99,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,113,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (100,118,6) — expected air
+[BC] BREAK cobblestone at (100,118,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,118,6)
+[BC] CLEAR: breaking dirt at (100,112,6) — expected air
+[BC] BREAK dirt at (100,112,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,112,6)
+[BC] CLEAR: breaking cobblestone at (100,113,6) — expected air
+[BC] BREAK cobblestone at (100,113,6) expected=air
+executing code...
+
+[BC] BREAK OK at (100,113,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,119,4) — expected air
+[BC] BREAK cobblestone at (99,119,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,119,4)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 1 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (100,114,6) — expected air
+[BC] BREAK cobblestone at (100,114,6) expected=air
+executing code...
+
+[BC] BREAK OK at (100,114,6)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (99,115,6) — expected air
+[BC] BREAK cobblestone at (99,115,6) expected=air
+executing code...
+
+[BC] BREAK OK at (99,115,6)
+[BC] CLEAR: breaking cobblestone at (100,115,6) — expected air
+[BC] BREAK cobblestone at (100,115,6) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,115,6)
+[BC] CLEAR: breaking cobblestone at (100,119,4) — expected air
+[BC] BREAK cobblestone at (100,119,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,119,4)
+stopping self-prompt loop
+executing code...
+
+self prompt loop stopped
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Path not found, but attempting to navigate anyway using destructive movements.
+Picked up 2 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (100,112,4) — expected air
+[BC] BREAK dirt at (100,112,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (100,112,4)
+[BC] CLEAR: breaking cobblestone at (99,112,5) — expected air
+[BC] BREAK cobblestone at (99,112,5) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (99,112,5)
+[BC] CLEAR: breaking cobblestone at (100,113,4) — expected air
+[BC] BREAK cobblestone at (100,113,4) expected=air
+executing code...
+
+[BC] BREAK OK at (100,113,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (100,114,4) — expected air
+[BC] BREAK cobblestone at (100,114,4) expected=air
+executing code...
+
+[BC] BREAK OK at (100,114,4)
+[BC] CLEAR: breaking cobblestone at (101,119,4) — expected air
+[BC] BREAK cobblestone at (101,119,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,119,4)
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+self prompt loop stopped
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking dirt at (101,112,4) — expected air
+[BC] BREAK dirt at (101,112,4) expected=air
+executing code...
+
+[BC] BREAK OK at (101,112,4)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] CLEAR: breaking cobblestone at (101,113,4) — expected air
+[BC] BREAK cobblestone at (101,113,4) expected=air
+executing code...
+
+[BC] BREAK OK at (101,113,4)
+stopping self-prompt loop
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+Mode item_collecting finished executing, code_return: Action output:
+Found non-destructive path.
+Picked up 0 items.
+
+self prompt loop stopped
+Restarting self-prompting...
+starting self-prompt loop
+[BC] CLEAR: breaking cobblestone at (101,114,4) — expected air
+[BC] BREAK cobblestone at (101,114,4) expected=air
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+[BC] BREAK OK at (101,114,4)
+executing code...
+
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)
+LAN server discovered via multicast: 192.168.237.138:42955 (Alica - Новый мир)

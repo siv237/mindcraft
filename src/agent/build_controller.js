@@ -614,19 +614,27 @@ export class BuildController {
     }
 
     findClearableBlocks() {
+        if (this.phase !== 'clearing') return [];
         const all = this.getAllBlocks();
         const clearable = [];
         for (const cell of all) {
-            if (cell.blueprintBlock !== 'air') continue;
+            if (cell.blueprintBlock === 'air') continue;
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current || current.name === 'air') continue;
             if (UTILITY_BLOCKS.includes(current.name)) continue;
+            if (blockSatisfied(cell.blueprintBlock, current)) continue;
+            const wp = this.getWorldPos(cell.x, cell.y, cell.z);
+            const wpKey = `${wp.x},${wp.y},${wp.z}`;
+            if (this.verifiedBlocks.has(wpKey)) continue;
+            const dist = this.bot.entity.position.distanceTo(wp);
+            if (dist > 32) continue;
             clearable.push({
                 x: cell.x, y: cell.y, z: cell.z,
                 expected: cell.blueprintBlock,
                 actual: current.name,
-                worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
+                worldPos: wp,
             });
+            if (clearable.length >= 5) break;
         }
         return clearable;
     }
@@ -726,20 +734,6 @@ export class BuildController {
             }
         }
 
-        const clearable = this.findClearableBlocks();
-        if (clearable.length > 0 && !isCreative) {
-            const c = clearable[0];
-            this.log(`CLEAR: breaking ${c.actual} at (${c.worldPos.x},${c.worldPos.y},${c.worldPos.z}) — expected air`);
-            return {
-                type: 'break',
-                done: false,
-                worldPos: c.worldPos,
-                expected: 'air',
-                actual: c.actual,
-                message: this.formatClearAction(c, progress, posStr, siteStr),
-            };
-        }
-
         const missing = this.findMissingBlocks(10);
         if (missing.length > 0) {
             const m = missing[0];
@@ -825,6 +819,20 @@ export class BuildController {
                     message: `BUILD PROGRESS: ${progress.percent}%. You are too far from build site ${siteStr} (${Math.floor(distToSite)} blocks). Go there first. Respond:`,
                 };
             }
+        }
+
+        const clearable = this.findClearableBlocks();
+        if (clearable.length > 0 && !isCreative) {
+            const c = clearable[0];
+            this.log(`CLEAR: breaking ${c.actual} at (${c.worldPos.x},${c.worldPos.y},${c.worldPos.z}) — expected air`);
+            return {
+                type: 'break',
+                done: false,
+                worldPos: c.worldPos,
+                expected: 'air',
+                actual: c.actual,
+                message: this.formatClearAction(c, progress, posStr, siteStr),
+            };
         }
 
         const wrong = this.findWrongBlocks();

@@ -15,11 +15,13 @@ const BLUEPRINTS_DIR = join(__dirname, '..', 'blueprints');
 const MC_VERSION = settings.minecraft_version === 'auto' ? '1.21.6' : (settings.minecraft_version || '1.21.6');
 initMcData(MC_VERSION);
 
+import { Vec3 } from 'vec3';
+
 function makeMockBot({ spawnPoint = { x: 100, y: 64, z: 200 }, position = { x: 105, y: 64, z: 205 }, gameMode = 'survival', blocks = {} } = {}) {
     const inv = {};
     return {
         spawnPoint,
-        entity: { position },
+        entity: { position: new Vec3(position.x, position.y, position.z) },
         game: { dimension: 'minecraft:overworld', gameMode },
         inventory: { slots: [] },
         registry: { blocksByName: { planks: { id: 5 }, oak_planks: { id: 5 }, cobblestone: { id: 4 }, stone_bricks: { id: 1 }, door: { id: 64 }, oak_door: { id: 64 }, air: { id: 0 }, dirt: { id: 3 }, torch: { id: 50 } } },
@@ -481,9 +483,10 @@ describe('BuildController - regression tests', () => {
         assert.ok(dirtWrong, 'dirt where planks expected should be wrong');
     });
 
-    it('findClearableBlocks should only find non-air where blueprint=air', () => {
+    it('findClearableBlocks should not break scaffolding (blueprint=air) during building', () => {
         bc.loadBlueprint('house_5x5');
         bc.buildSite = { x: 0, y: 0, z: 0 };
+        bc.phase = 'walls';
         const offset = bc.blueprint.offset || 0;
         const { sx, sz, sy } = bc.getDimensions();
         const blocks = {};
@@ -502,9 +505,32 @@ describe('BuildController - regression tests', () => {
         agent.bot = makeMockBot({ blocks });
         bc.agent.bot = agent.bot;
         const clearable = bc.findClearableBlocks();
-        assert.ok(clearable.length > 0, 'should find blocks to clear where blueprint=air');
+        assert.strictEqual(clearable.length, 0, 'should NOT clear scaffolding blocks during building phase');
+    });
+
+    it('findClearableBlocks should find obstacles in clearing phase', () => {
+        bc.loadBlueprint('house_5x5');
+        bc.buildSite = { x: 0, y: 0, z: 0 };
+        bc.phase = 'clearing';
+        const offset = bc.blueprint.offset || 0;
+        const { sx, sz, sy } = bc.getDimensions();
+        const blocks = {};
+        for (let y = 0; y < sy; y++) {
+            for (let z = 0; z < sz; z++) {
+                for (let x = 0; x < sx; x++) {
+                    const bp = bc.blueprint.blocks[y][z][x];
+                    if (bp !== 'air') {
+                        blocks[`${x},${y + offset},${z}`] = 'dirt';
+                    }
+                }
+            }
+        }
+        agent.bot = makeMockBot({ blocks, position: { x: 2, y: offset, z: 2 } });
+        bc.agent.bot = agent.bot;
+        const clearable = bc.findClearableBlocks();
+        assert.ok(clearable.length > 0, 'should find obstacles blocking blueprint blocks');
         for (const c of clearable) {
-            assert.strictEqual(c.expected, 'air');
+            assert.notStrictEqual(c.expected, 'air');
             assert.notStrictEqual(c.actual, 'air');
         }
     });
