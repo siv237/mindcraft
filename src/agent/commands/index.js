@@ -1,4 +1,4 @@
-import { getBlockId, getItemId } from "../../utils/mcdata.js";
+import { getBlockId, getItemId, getItemCraftingRecipes } from "../../utils/mcdata.js";
 import { actionsList } from './actions.js';
 import { queryList } from './queries.js';
 
@@ -235,6 +235,16 @@ export async function executeCommand(agent, message) {
             }
             if ((parsed.commandName === '!stop' || parsed.commandName === '!endGoal' || parsed.commandName === '!stfu') && agent.build_controller?.active) {
                 return `Cannot stop during building. The build controller is active. Use !newBuild to start a new build or ask the player to stop you.`;
+            }
+            if (parsed.commandName === '!craftRecipe' && agent.build_controller?.active) {
+                const itemName = parsed.args?.[0];
+                if (itemName) {
+                    const recipes = getItemCraftingRecipes(itemName);
+                    if (!recipes || recipes.length === 0) {
+                        const plan = agent.build_controller.formatMaterialPlan(itemName, parsed.args[1] || 1);
+                        return `${itemName} cannot be crafted! It must be obtained another way.\n${plan}\nFollow the STEPS. Do NOT try !craftRecipe("${itemName}") again.`;
+                    }
+                }
             }
             if (parsed.commandName === '!checkBuild' && agent.build_controller?.active && agent.self_prompter?.build_controller === agent.build_controller) {
                 const progress = agent.build_controller.computeProgress();

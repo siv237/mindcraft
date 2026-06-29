@@ -783,6 +783,23 @@ export class BuildController {
                         message: this.formatSalvageAction(s, resolvedName, progress, posStr, siteStr),
                     };
                 }
+
+                const smeltSource = REVERSE_SMELTING[resolvedName];
+                if (smeltSource && (inv[smeltSource] || 0) > 0) {
+                    const haveRaw = inv[smeltSource] || 0;
+                    const needCount = needed[resolvedName] || 1;
+                    const smeltCount = Math.min(haveRaw, needCount);
+                    this.log(`DIRECT SMELT: have ${haveRaw} ${smeltSource}, need ${needCount} ${resolvedName}, smelting ${smeltCount}`);
+                    return {
+                        type: 'smelt',
+                        done: false,
+                        source: smeltSource,
+                        target: resolvedName,
+                        count: smeltCount,
+                        message: this.formatGatherAction(m, resolvedName, progress, posStr, siteStr),
+                    };
+                }
+
                 return {
                     type: 'gather',
                     done: false,
@@ -960,6 +977,20 @@ export class BuildController {
             }
             return res;
         }
+        if (action.type === 'smelt') {
+            this.log(`DIRECT SMELT ${action.source} → ${action.target} x${action.count}`);
+            const actionFn = async () => {
+                await skills.smeltItem(this.bot, action.source, action.count);
+            };
+            const res = await this.agent.actions.runAction('build:smelt', actionFn, { timeout: 120 });
+            this.log(`SMELT result: ${res.message?.substring(0, 100)}`);
+            if (res.success !== false) {
+                setTimeout(() => {
+                    this.agent.cleanKill('Safely restarting after smelting to update inventory.');
+                }, 1000);
+            }
+            return res;
+        }
         return null;
     }
 
@@ -1102,12 +1133,25 @@ export class BuildController {
 
         const plan = this.getMaterialPlan(resolvedName, totalNeeded, inv);
         const haveStr = plan.have > 0 ? ` (already have ${plan.have})` : '';
+
+        const firstCollectStep = plan.steps.find(s => s.includes('collectBlocks'));
+        const firstSmeltStep = plan.steps.find(s => s.includes('smeltItem'));
+        const firstCraftStep = plan.steps.find(s => s.includes('craftRecipe'));
+
+        let nextStep = '';
+        if (firstCollectStep) {
+            nextStep = `NEXT ACTION: ${firstCollectStep}`;
+        } else if (firstSmeltStep) {
+            nextStep = `NEXT ACTION: ${firstSmeltStep}`;
+        } else if (firstCraftStep) {
+            nextStep = `NEXT ACTION: ${firstCraftStep}`;
+        } else {
+            nextStep = `You have all materials. Wait for the build controller to place blocks.`;
+        }
+
         const collectStr = Object.keys(plan.collect).length > 0
-            ? `GATHER THESE: ${Object.entries(plan.collect).map(([k, v]) => `${v}x ${k}`).join(', ')}.`
-            : `All materials in inventory — just craft!`;
-        const stepsStr = plan.steps.length > 0
-            ? `STEPS (do in order):\n${plan.steps.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}`
-            : `Nothing to do.`;
+            ? `Still need: ${Object.entries(plan.collect).map(([k, v]) => `${v}x ${k}`).join(', ')}.`
+            : `All materials gathered.`;
 
         const axes = ['diamond_axe', 'iron_axe', 'stone_axe', 'golden_axe', 'wooden_axe'];
         const pickaxes = ['diamond_pickaxe', 'iron_pickaxe', 'stone_pickaxe', 'golden_pickaxe', 'wooden_pickaxe'];
@@ -1120,12 +1164,12 @@ export class BuildController {
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
-            `You need ${totalNeeded}x ${resolvedName}${haveStr}.\n` +
-            `${collectStr}\n${stepsStr}\n` +
+            `You need ${totalNeeded}x ${resolvedName}${haveStr}. ${collectStr}\n` +
+            `${nextStep}\n` +
             `${toolHint}` +
-            `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. Do NOT discard materials. ` +
-            `The build controller will place blocks automatically. Only gather, smelt and craft. ` +
-            `Follow the STEPS in order. Respond:`;
+            `IMPORTANT: Do the NEXT ACTION above. Do NOT use !placeHere, !newAction, or !discard. ` +
+            `Do NOT try to craft items that have no recipe (glass, sand). ` +
+            `The build controller will place blocks automatically. Respond:`;
     }
 
     saveState() {

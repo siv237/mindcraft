@@ -103,7 +103,7 @@ export class SelfPrompter {
                         this.state = STOPPED;
                         break;
                     }
-                } else if (action.type === 'place' || action.type === 'break' || action.type === 'goto' || action.type === 'placeBatch') {
+                } else if (action.type === 'place' || action.type === 'break' || action.type === 'goto' || action.type === 'placeBatch' || action.type === 'smelt') {
                     directAction = action;
                     msg = action.message;
                 } else {
