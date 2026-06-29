@@ -1,5 +1,5 @@
 import { Vec3 } from 'vec3';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync, appendFileSync } from 'fs';
 import * as world from './library/world.js';
 import * as skills from './library/skills.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
@@ -15,11 +15,34 @@ export class BuildController {
         this.phaseIndex = 0;
         this.active = false;
         this.worldId = null;
-        this.statesDir = `./bots/${agent.name}/build_states`;
+        this.failCount = 0;
+        this.lastAction = null;
     }
 
     get bot() {
         return this.agent.bot;
+    }
+
+    get worldDir() {
+        return `./bots/${this.agent.name}/worlds/${this.getWorldId()}`;
+    }
+
+    get stateFile() {
+        return `${this.worldDir}/build_state.json`;
+    }
+
+    get logFile() {
+        return `${this.worldDir}/build.log`;
+    }
+
+    log(msg) {
+        const ts = new Date().toISOString();
+        const line = `[${ts}] ${msg}`;
+        console.log(`[BC] ${msg}`);
+        try {
+            mkdirSync(this.worldDir, { recursive: true });
+            appendFileSync(this.logFile, line + '\n');
+        } catch {}
     }
 
     getWorldId() {
@@ -34,10 +57,6 @@ export class BuildController {
             this.worldId = `${dim}_unknown`;
         }
         return this.worldId;
-    }
-
-    get stateFile() {
-        return `${this.statesDir}/${this.getWorldId()}.json`;
     }
 
     loadBlueprint(name) {
@@ -67,15 +86,17 @@ export class BuildController {
         this.phase = 'tools';
         this.phaseIndex = 0;
         this.active = true;
+        this.failCount = 0;
         this.saveState();
         this.agent.memory_bank.rememberPlace('build_site',
             this.buildSite.x, this.buildSite.y, this.buildSite.z);
-        console.log(`BuildController started: ${name} at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z})`);
+        this.log(`START build '${name}' at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
     }
 
     stop() {
         this.active = false;
         this.saveState();
+        this.log(`STOP build. Phase was: ${this.phase}`);
     }
 
     getDimensions() {
@@ -467,30 +488,51 @@ export class BuildController {
     async executeDirect(action) {
         if (action.type === 'place') {
             const wp = action.worldPos;
-            console.log(`BuildController: placing ${action.blockType} at (${wp.x}, ${wp.y}, ${wp.z})`);
+            this.log(`PLACE ${action.blockType} at (${wp.x},${wp.y},${wp.z})`);
             const actionFn = async () => {
                 await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 3);
                 await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
             };
             let res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
-            if (res.message && res.message.includes('Failed to place')) {
-                console.log(`BuildController: retry from different angle...`);
+            if (res.message && (res.message.includes('Failed to place') || res.success === false)) {
+                this.failCount++;
+                this.log(`PLACE FAILED #${this.failCount} at (${wp.x},${wp.y},${wp.z}): ${res.message.substring(0, 100)}`);
+                if (this.failCount >= 3) {
+                    this.log(`SKIP block at (${wp.x},${wp.y},${wp.z}) after ${this.failCount} failures`);
+                    this.failCount = 0;
+                    return res;
+                }
                 const actionFn2 = async () => {
                     await skills.goToPosition(this.bot, wp.x + 1, wp.y, wp.z + 1, 2);
                     await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
                 };
                 res = await this.agent.actions.runAction('build:place', actionFn2, { timeout: 30 });
+                if (res.message && res.message.includes('Failed to place')) {
+                    this.failCount++;
+                    this.log(`PLACE RETRY FAILED at (${wp.x},${wp.y},${wp.z})`);
+                } else {
+                    this.failCount = 0;
+                    this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
+                }
+            } else {
+                this.failCount = 0;
+                this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
             }
             return res;
         }
         if (action.type === 'break') {
             const wp = action.worldPos;
-            console.log(`BuildController: breaking ${action.actual} at (${wp.x}, ${wp.y}, ${wp.z})`);
+            this.log(`BREAK ${action.actual} at (${wp.x},${wp.y},${wp.z}) expected=${action.expected}`);
             const actionFn = async () => {
                 await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 3);
                 await skills.breakBlockAt(this.bot, wp.x, wp.y, wp.z);
             };
             const res = await this.agent.actions.runAction('build:break', actionFn, { timeout: 30 });
+            if (res.success === false) {
+                this.log(`BREAK FAILED at (${wp.x},${wp.y},${wp.z}): ${res.message?.substring(0, 100)}`);
+            } else {
+                this.log(`BREAK OK at (${wp.x},${wp.y},${wp.z})`);
+            }
             return res;
         }
         return null;
@@ -556,7 +598,7 @@ export class BuildController {
 
     saveState() {
         try {
-            mkdirSync(this.statesDir, { recursive: true });
+            mkdirSync(this.worldDir, { recursive: true });
             const data = {
                 worldId: this.getWorldId(),
                 blueprintName: this.blueprint?.name || null,
@@ -565,7 +607,6 @@ export class BuildController {
                 active: this.active,
             };
             writeFileSync(this.stateFile, JSON.stringify(data, null, 2));
-            console.log(`Saved build state for world ${this.worldId}: ${data.blueprintName} at (${data.buildSite?.x},${data.buildSite?.y},${data.buildSite?.z})`);
         } catch (e) {
             console.error('Failed to save build state:', e);
         }
@@ -573,10 +614,10 @@ export class BuildController {
 
     loadState() {
         try {
-            mkdirSync(this.statesDir, { recursive: true });
+            mkdirSync(this.worldDir, { recursive: true });
             const file = this.stateFile;
             if (!existsSync(file)) {
-                console.log(`No build state for world ${this.getWorldId()}. Starting fresh.`);
+                this.log(`No build state for world ${this.getWorldId()}. Starting fresh.`);
                 return false;
             }
             const data = JSON.parse(readFileSync(file, 'utf8'));
@@ -585,7 +626,7 @@ export class BuildController {
             this.buildSite = data.buildSite;
             this.phase = data.phase || 'clearing';
             this.active = data.active || false;
-            console.log(`Restored build state for world ${this.worldId}: ${data.blueprintName} at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}`);
+            this.log(`RESTORE build '${data.blueprintName}' at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}`);
             return this.active;
         } catch (e) {
             console.error('Failed to load build state:', e);

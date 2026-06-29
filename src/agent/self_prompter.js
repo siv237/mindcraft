@@ -88,10 +88,9 @@ export class SelfPrompter {
             if (this.build_controller && this.build_controller.active) {
                 const action = this.build_controller.getNextAction();
                 if (!action) {
-                    console.log('Build controller returned no action, using fallback prompt.');
                     msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
                 } else if (action.done) {
-                    console.log('Build complete:', action.message);
+                    this.build_controller.log(`BUILD COMPLETE: ${action.message}`);
                     this.agent.openChat(action.message);
                     this.build_controller.stop();
                     this.state = STOPPED;
@@ -100,6 +99,7 @@ export class SelfPrompter {
                     directAction = action;
                     msg = action.message;
                 } else {
+                    this.build_controller.log(`PROMPT to LLM (type=${action.type}): ${action.message.substring(0, 200)}`);
                     msg = action.message;
                 }
             } else {
@@ -108,11 +108,9 @@ export class SelfPrompter {
             
             let used_command;
             if (directAction) {
-                console.log(`Build direct execution: ${directAction.type} at ${directAction.worldPos}`);
                 const res = await this.build_controller.executeDirect(directAction);
                 used_command = true;
                 no_command_count = 0;
-                console.log(`Build direct result:`, res);
                 await new Promise(r => setTimeout(r, this.cooldown));
             } else {
                 used_command = await this.agent.handleMessage('system', msg, -1);
@@ -122,6 +120,7 @@ export class SelfPrompter {
                         let out = `Agent did not use command in the last ${MAX_NO_COMMAND} auto-prompts. Stopping auto-prompting.`;
                         this.agent.openChat(out);
                         console.warn(out);
+                        if (this.build_controller) this.build_controller.log(`STOP: no command for ${MAX_NO_COMMAND} prompts`);
                         this.state = STOPPED;
                         break;
                     }

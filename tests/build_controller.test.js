@@ -58,7 +58,7 @@ describe('BuildController', () => {
     beforeEach(() => {
         agent = makeMockAgent();
         bc = new BuildController(agent);
-        bc.statesDir = TEST_DIR;
+        Object.defineProperty(bc, 'worldDir', { get: () => TEST_DIR });
     });
 
     describe('loadBlueprint', () => {
@@ -145,7 +145,7 @@ describe('BuildController', () => {
             assert.strictEqual(saved.active, true);
 
             const bc2 = new BuildController(agent);
-            bc2.statesDir = TEST_DIR;
+            Object.defineProperty(bc2, 'worldDir', { get: () => TEST_DIR });
             const restored = bc2.loadState();
             assert.strictEqual(restored, true);
             assert.strictEqual(bc2.buildSite.x, 50);
@@ -156,7 +156,7 @@ describe('BuildController', () => {
 
         it('should return false when no state file exists', () => {
             const bc2 = new BuildController(agent);
-            bc2.statesDir = join(TEST_DIR, 'nonexistent_dir');
+            Object.defineProperty(bc2, 'worldDir', { get: () => join(TEST_DIR, 'nonexistent_dir') });
             const restored = bc2.loadState();
             assert.strictEqual(restored, false);
         });
@@ -165,12 +165,12 @@ describe('BuildController', () => {
             bc.start('house_5x5', { x: 100, y: 200, z: 300 });
 
             const bc2 = new BuildController(agent);
-            bc2.statesDir = TEST_DIR;
+            Object.defineProperty(bc2, 'worldDir', { get: () => TEST_DIR });
             bc2.loadState();
             assert.deepStrictEqual(bc2.buildSite, { x: 100, y: 200, z: 300 });
 
             const bc3 = new BuildController(agent);
-            bc3.statesDir = TEST_DIR;
+            Object.defineProperty(bc3, 'worldDir', { get: () => TEST_DIR });
             bc3.loadState();
             assert.deepStrictEqual(bc3.buildSite, { x: 100, y: 200, z: 300 });
         });
