@@ -4,7 +4,7 @@ import * as world from './library/world.js';
 import * as skills from './library/skills.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
 
-const PHASES = ['clearing', 'floor', 'walls', 'roof', 'details', 'done'];
+const PHASES = ['tools', 'clearing', 'floor', 'walls', 'roof', 'details', 'done'];
 
 export class BuildController {
     constructor(agent) {
@@ -61,7 +61,7 @@ export class BuildController {
             const pos = this.bot.entity.position;
             this.buildSite = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
         }
-        this.phase = 'clearing';
+        this.phase = 'tools';
         this.phaseIndex = 0;
         this.active = true;
         this.saveState();
@@ -142,6 +142,27 @@ export class BuildController {
         if (progress.percent >= 100) {
             this.phase = 'done';
             return 'done';
+        }
+
+        const inv = this.getInventoryCounts();
+        const isCreative = this.bot.game?.gameMode === 'creative';
+
+        if (!isCreative) {
+            const hasAxe = inv['wooden_axe'] || inv['stone_axe'] || inv['iron_axe'] || inv['diamond_axe'] || inv['golden_axe'];
+            const hasPickaxe = inv['wooden_pickaxe'] || inv['stone_pickaxe'] || inv['iron_pickaxe'] || inv['diamond_pickaxe'] || inv['golden_pickaxe'];
+            if (!hasAxe || !hasPickaxe) {
+                this.phase = 'tools';
+                return 'tools';
+            }
+        }
+
+        if (this.phase === 'tools' && !isCreative) {
+            const hasAxe = inv['wooden_axe'] || inv['stone_axe'] || inv['iron_axe'] || inv['diamond_axe'] || inv['golden_axe'];
+            const hasPickaxe = inv['wooden_pickaxe'] || inv['stone_pickaxe'] || inv['iron_pickaxe'] || inv['diamond_pickaxe'] || inv['golden_pickaxe'];
+            if (!hasAxe || !hasPickaxe) {
+                return 'tools';
+            }
+            this.phase = 'clearing';
         }
 
         if (this.phase === 'clearing') {
@@ -247,6 +268,68 @@ export class BuildController {
         return world.getInventoryCounts(this.bot);
     }
 
+    getToolAction(inv, posStr, siteStr, progress) {
+        const axes = ['diamond_axe', 'iron_axe', 'stone_axe', 'golden_axe', 'wooden_axe'];
+        const pickaxes = ['diamond_pickaxe', 'iron_pickaxe', 'stone_pickaxe', 'golden_pickaxe', 'wooden_pickaxe'];
+        const hasAxe = axes.find(a => inv[a] > 0);
+        const hasPickaxe = pickaxes.find(p => inv[p] > 0);
+
+        if (hasAxe && hasPickaxe) return null;
+
+        const haveLogs = inv['oak_log'] || 0;
+        const havePlanks = inv['oak_planks'] || 0;
+        const haveSticks = inv['stick'] || 0;
+        const haveCobblestone = inv['cobblestone'] || 0;
+
+        let needAxe = !hasAxe;
+        let needPickaxe = !hasPickaxe;
+
+        let steps = [];
+        let invSummary = `oak_log:${haveLogs}, oak_planks:${havePlanks}, sticks:${haveSticks}, cobblestone:${haveCobblestone}`;
+
+        if (needAxe) {
+            if (haveCobblestone > 0 && havePlanks >= 3 && haveSticks >= 2 && hasPickaxe) {
+                steps.push(`Craft stone axe: !craftRecipe("stone_axe", 1)`);
+            } else if (havePlanks >= 3 && haveSticks >= 2) {
+                steps.push(`Craft wooden axe: !craftRecipe("wooden_axe", 1)`);
+            } else if (haveLogs >= 1) {
+                steps.push(`Craft planks: !craftRecipe("oak_planks", 2)`);
+                steps.push(`Craft sticks: !craftRecipe("stick", 4)`);
+                steps.push(`Craft wooden axe: !craftRecipe("wooden_axe", 1)`);
+            } else {
+                steps.push(`Collect wood: !collectBlocks("oak_log", 5)`);
+            }
+        }
+        if (needPickaxe) {
+            if (haveCobblestone > 0 && havePlanks >= 3 && haveSticks >= 2) {
+                steps.push(`Craft stone pickaxe: !craftRecipe("stone_pickaxe", 1)`);
+            } else if (havePlanks >= 3 && haveSticks >= 2) {
+                steps.push(`Craft wooden pickaxe: !craftRecipe("wooden_pickaxe", 1)`);
+            } else if (haveLogs >= 1) {
+                steps.push(`Craft planks: !craftRecipe("oak_planks", 2)`);
+                steps.push(`Craft sticks: !craftRecipe("stick", 4)`);
+                steps.push(`Craft wooden pickaxe: !craftRecipe("wooden_pickaxe", 1)`);
+            } else {
+                steps.push(`Collect wood: !collectBlocks("oak_log", 5)`);
+            }
+        }
+
+        const currentStep = steps[0];
+        const toolList = [];
+        if (needAxe) toolList.push('axe');
+        if (needPickaxe) toolList.push('pickaxe');
+        return {
+            type: 'gather',
+            done: false,
+            message: `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
+                `Phase: tools. Build site: ${siteStr}. Your position: ${posStr}.\n` +
+                `You need: ${toolList.join(' and ')}. You can gather by hand but tools are much faster.\n` +
+                `Inventory: ${invSummary}.\n` +
+                `NEXT STEP: ${currentStep}\n` +
+                `IMPORTANT: Do NOT use !placeHere or !newAction. Only gather and craft. Respond:`,
+        };
+    }
+
     resolveBlockName(blueprintName) {
         return getTypeOfGeneric(this.bot, blueprintName);
     }
@@ -284,6 +367,9 @@ export class BuildController {
         const posStr = `x:${Math.floor(pos.x)}, y:${Math.floor(pos.y)}, z:${Math.floor(pos.z)}`;
         const progress = this.computeProgress();
         const siteStr = `(${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z})`;
+        const inv = this.getInventoryCounts();
+        const gameMode = this.bot.game?.gameMode;
+        const isCreative = gameMode === 'creative';
 
         if (phase === 'done') {
             this.active = false;
@@ -294,6 +380,11 @@ export class BuildController {
                 message: `HOUSE COMPLETE! Progress: ${progress.percent}%. Build site: ${siteStr}. ` +
                     `The house is fully built. You can relax now.`,
             };
+        }
+
+        if (phase === 'tools') {
+            const toolAction = this.getToolAction(inv, posStr, siteStr, progress);
+            if (toolAction) return toolAction;
         }
 
         if (phase === 'clearing') {
@@ -315,10 +406,7 @@ export class BuildController {
         if (missing.length > 0) {
             const m = missing[0];
             const resolvedName = this.resolveBlockName(m.blueprintBlock);
-            const inv = this.getInventoryCounts();
             const haveCount = inv[resolvedName] || 0;
-            const gameMode = this.bot.game?.gameMode;
-            const isCreative = gameMode === 'creative';
 
             if (isCreative || haveCount > 0) {
                 return {
@@ -330,6 +418,14 @@ export class BuildController {
                     message: this.formatPlaceAction(m, resolvedName, progress, posStr, siteStr),
                 };
             } else {
+                if (!isCreative) {
+                    const hasAxe = inv['wooden_axe'] || inv['stone_axe'] || inv['iron_axe'] || inv['diamond_axe'] || inv['golden_axe'];
+                    const hasPickaxe = inv['wooden_pickaxe'] || inv['stone_pickaxe'] || inv['iron_pickaxe'] || inv['diamond_pickaxe'] || inv['golden_pickaxe'];
+                    if (!hasAxe || !hasPickaxe) {
+                        this.phase = 'tools';
+                        return this.getToolAction(inv, posStr, siteStr, progress);
+                    }
+                }
                 return {
                     type: 'gather',
                     done: false,
@@ -415,7 +511,7 @@ export class BuildController {
 
     formatGatherAction(m, resolvedName, progress, posStr, siteStr) {
         const inv = this.getInventoryCounts();
-        const isCreative = this.bot.game.gameMode === 'creative';
+        const isCreative = this.bot.game?.gameMode === 'creative';
         if (isCreative) {
             const wp = m.worldPos;
             return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
@@ -427,9 +523,16 @@ export class BuildController {
         const neededStr = Object.entries(needed).map(([k, v]) => `${v}x ${k}`).join(', ');
         const haveLogs = inv['oak_log'] || 0;
         const havePlanks = inv['oak_planks'] || 0;
+        const axes = ['diamond_axe', 'iron_axe', 'stone_axe', 'golden_axe', 'wooden_axe'];
+        const pickaxes = ['diamond_pickaxe', 'iron_pickaxe', 'stone_pickaxe', 'golden_pickaxe', 'wooden_pickaxe'];
+        const hasAxe = axes.find(a => inv[a] > 0);
+        const hasPickaxe = pickaxes.find(p => inv[p] > 0);
+        let toolHint = '';
+        if (!hasAxe) toolHint += `You have NO axe. Crafting one will speed up wood gathering a lot. `;
+        if (!hasPickaxe) toolHint += `You have NO pickaxe. You will need one for stone. `;
         let gatherHint;
         if (havePlanks > 0) {
-            gatherHint = `You already have ${havePlanks} oak_planks. Try crafting what you need: !craftRecipe("${resolvedName}", 1).`;
+            gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 1).`;
         } else if (haveLogs > 0) {
             gatherHint = `You already have ${haveLogs} oak_log. Craft planks first: !craftRecipe("oak_planks", 2). Then craft: !craftRecipe("${resolvedName}", 1).`;
         } else {
@@ -439,6 +542,7 @@ export class BuildController {
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
             `You need ${resolvedName}. ${gatherHint}\n` +
+            `${toolHint}` +
             `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. The build controller will place blocks automatically. ` +
             `Only gather and craft materials. Respond:`;
     }
