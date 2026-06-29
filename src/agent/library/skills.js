@@ -158,7 +158,7 @@ export async function smeltItem(bot, itemName, num=1) {
 
     let placedFurnace = false;
     let furnaceBlock = undefined;
-    const furnaceRange = 16;
+    const furnaceRange = 32;
     furnaceBlock = world.getNearestBlock(bot, 'furnace', furnaceRange);
     if (!furnaceBlock){
         // Try to place furnace
@@ -187,17 +187,21 @@ export async function smeltItem(bot, itemName, num=1) {
     if (input_item && input_item.type !== mc.getItemId(itemName) && input_item.count > 0) {
         // TODO: check if furnace is currently burning fuel. furnace.fuel is always null, I think there is a bug.
         // This only checks if the furnace has an input item, but it may not be smelting it and should be cleared.
-        log(bot, `The furnace is currently smelting ${mc.getItemName(input_item.type)}.`);
-        if (placedFurnace)
-            await collectBlock(bot, 'furnace', 1);
-        return false;
+        log(bot, `The furnace is currently smelting ${mc.getItemName(input_item.type)}. Waiting for it to finish.`);
+        let waitCount = 0;
+        while (furnace.inputItem() && waitCount < 120) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (furnace.outputItem()) {
+                await furnace.takeOutput();
+            }
+            waitCount++;
+        }
     }
     // check if the bot has enough items to smelt
     let inv_counts = world.getInventoryCounts(bot);
     if (!inv_counts[itemName] || inv_counts[itemName] < num) {
         log(bot, `You do not have enough ${itemName} to smelt.`);
-        if (placedFurnace)
-            await collectBlock(bot, 'furnace', 1);
+        await bot.closeWindow(furnace);
         return false;
     }
 
@@ -206,8 +210,7 @@ export async function smeltItem(bot, itemName, num=1) {
         let fuel = mc.getSmeltingFuel(bot);
         if (!fuel) {
             log(bot, `You have no fuel to smelt ${itemName}, you need coal, charcoal, or wood.`);
-            if (placedFurnace)
-                await collectBlock(bot, 'furnace', 1);
+            await bot.closeWindow(furnace);
             return false;
         }
         log(bot, `Using ${fuel.name} as fuel.`);
@@ -216,8 +219,7 @@ export async function smeltItem(bot, itemName, num=1) {
 
         if (fuel.count < put_fuel) {
             log(bot, `You don't have enough ${fuel.name} to smelt ${num} ${itemName}; you need ${put_fuel}.`);
-            if (placedFurnace)
-                await collectBlock(bot, 'furnace', 1);
+            await bot.closeWindow(furnace);
             return false;
         }
         await furnace.putFuel(fuel.type, null, put_fuel);
@@ -240,8 +242,8 @@ export async function smeltItem(bot, itemName, num=1) {
                 last_collected = Date.now();
             }
         }
-        if (Date.now() - last_collected > 11000) {
-            break; // if nothing has been collected in 11 seconds, stop
+        if (Date.now() - last_collected > 30000) {
+            break; // first item takes ~10s to smelt, allow 30s timeout
         }
         if (bot.interrupt_code) {
             break;
@@ -257,9 +259,7 @@ export async function smeltItem(bot, itemName, num=1) {
 
     await bot.closeWindow(furnace);
 
-    if (placedFurnace) {
-        await collectBlock(bot, 'furnace', 1);
-    }
+    // NEVER collect furnace — leave for reuse
     if (total === 0) {
         log(bot, `Failed to smelt ${itemName}.`);
         return false;

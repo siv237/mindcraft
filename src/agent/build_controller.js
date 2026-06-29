@@ -41,6 +41,7 @@ export class BuildController {
         this.queue = new BuildQueue(this);
         this.verifiedBlocks = new Set();
         this.utilityPositions = {};
+        this.utilities = [];
     }
 
     get bot() {
@@ -57,6 +58,10 @@ export class BuildController {
 
     get logFile() {
         return `${this.worldDir}/build.log`;
+    }
+
+    get utilitiesFile() {
+        return `${this.worldDir}/utilities.json`;
     }
 
     log(msg) {
@@ -1186,6 +1191,109 @@ export class BuildController {
             `The build controller will place blocks automatically. Respond:`;
     }
 
+    scanUtilityBlocks() {
+        const found = [];
+        for (const type of UTILITY_BLOCKS) {
+            const blocks = this.bot.findBlocks({ matching: this.bot.registry.blocksByName[type]?.id, maxDistance: 64, count: 10 });
+            for (const pos of blocks) {
+                const existing = this.utilities.find(u => u.x === pos.x && u.y === pos.y && u.z === pos.z);
+                if (!existing) {
+                    const entry = {
+                        type,
+                        x: pos.x, y: pos.y, z: pos.z,
+                        contents: [],
+                        lastChecked: 0,
+                        status: 'unknown',
+                    };
+                    this.utilities.push(entry);
+                    found.push(entry);
+                }
+            }
+        }
+        if (found.length > 0) {
+            this.log(`SCAN UTILITIES: found ${found.length} new utility blocks (${found.map(f => `${f.type}@${f.x},${f.y},${f.z}`).join(', ')})`);
+            this.saveUtilities();
+        }
+        return found;
+    }
+
+    registerUtility(type, x, y, z, contents = []) {
+        const existing = this.utilities.find(u => u.x === x && u.y === y && u.z === z);
+        if (existing) {
+            existing.contents = contents;
+            existing.lastChecked = Date.now();
+            existing.status = contents.length > 0 ? 'has_items' : 'empty';
+        } else {
+            this.utilities.push({
+                type, x, y, z,
+                contents,
+                lastChecked: Date.now(),
+                status: contents.length > 0 ? 'has_items' : 'empty',
+            });
+        }
+        this.utilityPositions[type] = { x, y, z };
+        this.log(`REGISTER ${type} at (${x},${y},${z}) — ${contents.length} items, status: ${contents.length > 0 ? 'has_items' : 'empty'}`);
+        this.saveUtilities();
+    }
+
+    updateUtilityContents(x, y, z, contents) {
+        const u = this.utilities.find(u => u.x === x && u.y === y && u.z === z);
+        if (u) {
+            u.contents = contents;
+            u.lastChecked = Date.now();
+            u.status = contents.length > 0 ? 'has_items' : 'empty';
+            this.saveUtilities();
+            this.log(`UPDATE ${u.type} at (${x},${y},${z}) — ${contents.length} items recorded`);
+        }
+    }
+
+    findUtility(type, status = null) {
+        this.scanUtilityBlocks();
+        let candidates = this.utilities.filter(u => u.type === type);
+        if (status) candidates = candidates.filter(u => u.status === status);
+        if (candidates.length === 0) return null;
+        const botPos = this.bot.entity.position;
+        candidates.sort((a, b) => {
+            const da = botPos.distanceTo(new Vec3(a.x, a.y, a.z));
+            const db = botPos.distanceTo(new Vec3(b.x, b.y, b.z));
+            return da - db;
+        });
+        return candidates[0];
+    }
+
+    getPendingSmeltResults() {
+        const now = Date.now();
+        return this.utilities.filter(u =>
+            u.type === 'furnace' &&
+            u.status === 'smelting' &&
+            u.readyAt && u.readyAt <= now
+        );
+    }
+
+    saveUtilities() {
+        try {
+            mkdirSync(this.worldDir, { recursive: true });
+            writeFileSync(this.utilitiesFile, JSON.stringify(this.utilities, null, 2));
+        } catch (e) {
+            console.error('Failed to save utilities:', e);
+        }
+    }
+
+    loadUtilities() {
+        try {
+            if (existsSync(this.utilitiesFile)) {
+                this.utilities = JSON.parse(readFileSync(this.utilitiesFile, 'utf8'));
+                this.log(`LOADED ${this.utilities.length} utility blocks from file`);
+                for (const u of this.utilities) {
+                    this.utilityPositions[u.type] = { x: u.x, y: u.y, z: u.z };
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load utilities:', e);
+            this.utilities = [];
+        }
+    }
+
     saveState() {
         try {
             mkdirSync(this.worldDir, { recursive: true });
@@ -1197,6 +1305,7 @@ export class BuildController {
                 active: this.active,
                 verifiedBlocks: [...this.verifiedBlocks],
                 utilityPositions: this.utilityPositions,
+                utilities: this.utilities,
             };
             writeFileSync(this.stateFile, JSON.stringify(data, null, 2));
         } catch (e) {
@@ -1220,7 +1329,10 @@ export class BuildController {
             this.active = data.active || false;
             this.verifiedBlocks = new Set(data.verifiedBlocks || []);
             this.utilityPositions = data.utilityPositions || {};
+            this.utilities = data.utilities || [];
             this.smeltFailCount = 0;
+            this.loadUtilities();
+            this.scanUtilityBlocks();
             this.log(`RESTORE build '${data.blueprintName}' at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}, verified: ${this.verifiedBlocks.size} blocks`);
             return this.active;
         } catch (e) {

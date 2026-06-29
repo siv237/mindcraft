@@ -1,7 +1,14 @@
 import * as skills from '../library/skills.js';
+import * as world from '../library/world.js';
 import settings from '../settings.js';
 import convoManager from '../conversation.js';
 import { BuildController } from '../build_controller.js';
+
+const SMELTING_MAP = {
+    'sand': 'glass', 'red_sand': 'red_glass', 'cobblestone': 'stone',
+    'raw_iron': 'iron_ingot', 'raw_gold': 'gold_ingot', 'raw_copper': 'copper_ingot',
+    'clay_ball': 'brick', 'netherrack': 'nether_brick', 'kelp': 'dried_kelp', 'cactus': 'green_dye',
+};
 
 
 function runAsAction (actionFn, resume = false, timeout = -1) {
@@ -284,7 +291,23 @@ export const actionsList = [
         },
         perform: runAsAction(async (agent, item_name, num) => {
             let success = await skills.smeltItem(agent.bot, item_name, num);
-            return success ? `Smelted ${num} ${item_name}.` : `Failed to smelt ${item_name}.`;
+            if (agent.build_controller?.active) {
+                const furnaceBlock = world.getNearestBlock(agent.bot, 'furnace', 32);
+                if (furnaceBlock) {
+                    const pos = furnaceBlock.position;
+                    const readyAt = Date.now() + (num * 10000);
+                    agent.build_controller.registerUtility('furnace', pos.x, pos.y, pos.z,
+                        [{ item: item_name, count: num, result: SMELTING_MAP[item_name] || item_name }]);
+                    const u = agent.build_controller.utilities.find(u2 => u2.x === pos.x && u2.y === pos.y && u2.z === pos.z);
+                    if (u) {
+                        u.status = success ? 'done' : 'smelting';
+                        u.readyAt = readyAt;
+                        agent.build_controller.saveUtilities();
+                    }
+                    agent.build_controller.log(`SMELT ${success ? 'OK' : 'PENDING'}: ${item_name} x${num} at furnace (${pos.x},${pos.y},${pos.z}), ready at ${new Date(readyAt).toISOString()}`);
+                }
+            }
+            return success ? `Smelted ${num} ${item_name}.` : `Smelting ${item_name}, check back later.`;
         })
     },
     {
@@ -691,6 +714,25 @@ export const actionsList = [
             const plan = agent.build_controller.formatMaterialPlan(item_name, num || 1);
             agent.build_controller.log(`CRAFTPLAN: ${item_name} x${num}`);
             return plan;
+        }
+    },
+    {
+        name: '!checkUtilities',
+        description: 'List all known furnaces, chests, and crafting tables with their locations, contents, and status.',
+        params: {},
+        perform: async function(agent) {
+            if (!agent.build_controller) return 'No build controller active.';
+            agent.build_controller.scanUtilityBlocks();
+            const utils = agent.build_controller.utilities;
+            if (utils.length === 0) return 'No utility blocks found nearby.';
+            const lines = ['UTILITY BLOCKS:'];
+            for (const u of utils) {
+                const age = u.lastChecked ? `${Math.round((Date.now() - u.lastChecked) / 1000)}s ago` : 'never';
+                const contentsStr = u.contents.length > 0 ? u.contents.map(c => `${c.count}x ${c.result || c.item}`).join(', ') : 'empty';
+                const readyStr = u.readyAt ? (u.readyAt <= Date.now() ? 'READY' : `ready in ${Math.round((u.readyAt - Date.now()) / 1000)}s`) : '';
+                lines.push(`  ${u.type} at (${u.x},${u.y},${u.z}) — ${u.status}, checked ${age}, contents: ${contentsStr} ${readyStr}`);
+            }
+            return lines.join('\n');
         }
     },
 ];
