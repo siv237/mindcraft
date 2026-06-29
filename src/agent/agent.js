@@ -10,6 +10,8 @@ import { NPCContoller } from './npc/controller.js';
 import { MemoryBank } from './memory_bank.js';
 import { SelfPrompter } from './self_prompter.js';
 import { BuildController } from './build_controller.js';
+import { getServer } from '../mindcraft/mcserver.js';
+import { Vec3 } from 'vec3';
 import convoManager from './conversation.js';
 import { handleTranslation, handleEnglishTranslation } from '../utils/translator.js';
 import { addBrowserViewer } from './vision/browser_viewer.js';
@@ -65,6 +67,33 @@ export class Agent {
         blacklistCommands(this.blocked_actions);
 
         console.log(this.name, 'logging into minecraft...');
+
+        // Re-discover MC server via multicast on every startup
+        // This handles server restarts with new port/world
+        let discovered = false;
+        for (let attempt = 1; attempt <= 5; attempt++) {
+            try {
+                console.log(`Server discovery attempt ${attempt}/5...`);
+                const server = await getServer('auto', -1, settings.minecraft_version);
+                settings.host = server.host;
+                settings.port = server.port;
+                settings.minecraft_version = server.version;
+                discovered = true;
+                break;
+            } catch (e) {
+                console.warn(`Server discovery failed: ${e.message}`);
+                if (attempt < 5) {
+                    console.log(`Retrying in 10 seconds...`);
+                    await new Promise(r => setTimeout(r, 10000));
+                }
+            }
+        }
+        if (!discovered) {
+            console.error('Could not find Minecraft server after 5 attempts. Exiting.');
+            process.exit(1);
+            return;
+        }
+
         this.bot = initBot(this.name);
         
         // Connection Handler
@@ -200,7 +229,18 @@ export class Agent {
             if (init_message) {
                 this.history.add('system', init_message);
             }
-            const buildActive = this.build_controller.loadState();
+            let buildActive = this.build_controller.loadState();
+            if (buildActive) {
+                const site = this.build_controller.buildSite;
+                const blockAt = this.bot.blockAt(new Vec3(site.x, site.y, site.z));
+                if (!blockAt || blockAt.name === 'air' || blockAt.name === 'void_air' || site.y < -64) {
+                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void/air — likely a new world. Clearing old build state.`);
+                    this.build_controller.stop();
+                    const { unlinkSync } = await import('fs');
+                    try { unlinkSync(this.build_controller.stateFile); } catch {}
+                    buildActive = false;
+                }
+            }
             await this.self_prompter.handleLoad(
                 save_data.self_prompt,
                 save_data.self_prompting_state,

@@ -29,6 +29,7 @@ export class AgentProcess {
         });
         
         let last_restart = Date.now();
+        let quick_exit_count = 0;
         agentProcess.on('exit', (code, signal) => {
             console.log(`Agent process exited with code ${code} and signal ${signal}`);
             this.running = false;
@@ -40,11 +41,19 @@ export class AgentProcess {
             }
 
             if (code !== 0 && signal !== 'SIGINT') {
-                // agent must run for at least 10 seconds before restarting
-                if (Date.now() - last_restart < 10000) {
-                    console.error(`Agent process exited too quickly and will not be restarted.`);
+                const elapsed = Date.now() - last_restart;
+                if (elapsed < 10000) {
+                    quick_exit_count++;
+                    const delay = Math.min(quick_exit_count * 15, 60);
+                    console.error(`Agent exited too quickly (${elapsed}ms). Waiting ${delay}s before retry #${quick_exit_count}...`);
+                    setTimeout(() => {
+                        console.log(`Restarting agent after ${delay}s delay...`);
+                        this.start(true, 'Agent process restarted.', count_id, this.port);
+                        last_restart = Date.now();
+                    }, delay * 1000);
                     return;
                 }
+                quick_exit_count = 0;
                 console.log('Restarting agent...');
                 this.start(true, 'Agent process restarted.', count_id, this.port);
                 last_restart = Date.now();
