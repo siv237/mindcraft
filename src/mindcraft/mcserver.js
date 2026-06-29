@@ -1,8 +1,67 @@
 import net from 'net';
+import dgram from 'dgram';
 import mc from 'minecraft-protocol';
 
 /**
- * Scans the IP address for Minecraft LAN servers and collects their info.
+ * Discovers a Minecraft LAN server via UDP multicast.
+ * Minecraft "Open to LAN" broadcasts [MOTD]...[/MOTD][AD]PORT[/AD] to 224.0.2.60:4445.
+ * @param {number} timeout - How long to listen for broadcasts (ms).
+ * @returns {Promise<{host: string, port: number, motd: string}>} - Server info from multicast.
+ */
+export function discoverLanServer(timeout = 10000) {
+    return new Promise((resolve, reject) => {
+        const MULTICAST_ADDR = '224.0.2.60';
+        const MULTICAST_PORT = 4445;
+
+        const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+
+        let resolved = false;
+
+        const cleanup = () => {
+            if (!resolved) {
+                resolved = true;
+                try { socket.dropMembership(MULTICAST_ADDR); } catch {}
+                socket.close();
+            }
+        };
+
+        const timer = setTimeout(() => {
+            cleanup();
+            reject(new Error(`No Minecraft LAN server discovered within ${timeout}ms. Make sure the world is open to LAN.`));
+        }, timeout);
+
+        socket.on('message', (msg, rinfo) => {
+            const text = msg.toString('utf8');
+            const portMatch = text.match(/\[AD\](\d+)\[\/AD\]/);
+            const motdMatch = text.match(/\[MOTD\](.*?)\[\/MOTD\]/);
+            if (portMatch) {
+                const port = parseInt(portMatch[1], 10);
+                const motd = motdMatch ? motdMatch[1] : 'Unknown';
+                const host = rinfo.address;
+                console.log(`LAN server discovered via multicast: ${host}:${port} (${motd})`);
+                resolved = true;
+                clearTimeout(timer);
+                cleanup();
+                resolve({ host, port, motd });
+            }
+        });
+
+        socket.on('error', (err) => {
+            cleanup();
+            clearTimeout(timer);
+            reject(new Error(`Multicast discovery error: ${err.message}`));
+        });
+
+        socket.bind(MULTICAST_PORT, () => {
+            socket.addMembership(MULTICAST_ADDR);
+            socket.setBroadcast(true);
+            console.log(`Listening for Minecraft LAN broadcasts on ${MULTICAST_ADDR}:${MULTICAST_PORT}...`);
+        });
+    });
+}
+
+/**
+ * Pings a Minecraft server and collects its info.
  * @param {string} ip - The IP address to scan.
  * @param {number} port - The port to check.
  * @param {number} timeout - The connection timeout in ms.
@@ -112,9 +171,19 @@ export async function getServer(host, port, version) {
     let server = null;
     let serverString = "";
     let serverVersion = "";
-    
+
+    // Auto-discover server via multicast when host is "auto"
+    if (host === 'auto' || (port === -1 && (host === 'localhost' || host === '0.0.0.0' || !host)))
+    {
+        console.log(`Auto-discovering Minecraft LAN server via multicast...`);
+        const discovered = await discoverLanServer(10000);
+        host = discovered.host;
+        port = discovered.port;
+        console.log(`Discovered server at ${host}:${port}`);
+        server = await serverInfo(host, port, 2000, true);
+    }
     // Search for server
-    if (port == -1)
+    else if (port == -1)
     {
         console.log(`No port provided. Searching for LAN server on host ${host}...`);
         

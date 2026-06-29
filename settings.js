@@ -1,7 +1,7 @@
 const settings = {
     "minecraft_version": "auto", // or specific version like "1.21.6"
-    "host": "192.168.237.187", // or "localhost", "your.ip.address.here"
-    "port": 6666, // set to -1 to automatically scan for open ports
+    "host": "auto", // "auto" = discover via LAN multicast, or specific IP
+    "port": -1, // -1 = auto-detect port from LAN broadcast
     "auth": "offline", // or "microsoft"
 
     // the mindserver manages all agents and hosts the UI
