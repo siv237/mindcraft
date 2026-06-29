@@ -99,7 +99,7 @@ export class SelfPrompter {
                     directAction = action;
                     msg = action.message;
                 } else {
-                    this.build_controller.log(`PROMPT to LLM (type=${action.type}): ${action.message.substring(0, 200)}`);
+                    this.build_controller.log(`PROMPT→LLM type=${action.type} pos=${posStr}: ${action.message.substring(0, 300)}`);
                     msg = action.message;
                 }
             } else {
@@ -114,6 +114,15 @@ export class SelfPrompter {
                 await new Promise(r => setTimeout(r, this.cooldown));
             } else {
                 used_command = await this.agent.handleMessage('system', msg, -1);
+                if (this.build_controller && this.build_controller.active) {
+                    if (used_command) {
+                        const inv = this.build_controller.getInventoryCounts();
+                        const invStr = Object.entries(inv).filter(([k,v]) => v > 0).map(([k,v]) => `${v}x ${k}`).join(', ') || 'empty';
+                        this.build_controller.log(`LLM→COMMAND used_command=true pos=${posStr} inv={${invStr}}`);
+                    } else {
+                        this.build_controller.log(`LLM→NO_COMMAND pos=${posStr} no_command_count=${no_command_count + 1}`);
+                    }
+                }
                 if (!used_command) {
                     no_command_count++;
                     if (no_command_count >= MAX_NO_COMMAND) {

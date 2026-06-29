@@ -162,9 +162,11 @@ export class BuildController {
     determinePhase() {
         const { sy, sz, sx } = this.getDimensions();
         const progress = this.computeProgress();
+        const oldPhase = this.phase;
 
         if (progress.percent >= 100) {
             this.phase = 'done';
+            if (oldPhase !== 'done') this.log(`PHASE: ${oldPhase}→done progress=${progress.percent}%`);
             return 'done';
         }
 
@@ -176,6 +178,7 @@ export class BuildController {
             const hasPickaxe = inv['wooden_pickaxe'] || inv['stone_pickaxe'] || inv['iron_pickaxe'] || inv['diamond_pickaxe'] || inv['golden_pickaxe'];
             if (!hasAxe || !hasPickaxe) {
                 this.phase = 'tools';
+                if (oldPhase !== 'tools') this.log(`PHASE: ${oldPhase}→tools (no axe/pickaxe) progress=${progress.percent}%`);
                 return 'tools';
             }
         }
@@ -187,26 +190,31 @@ export class BuildController {
                 return 'tools';
             }
             this.phase = 'clearing';
+            this.log(`PHASE: tools→clearing (tools ready)`);
         }
 
         if (this.phase === 'tools' && isCreative) {
             this.phase = 'clearing';
+            this.log(`PHASE: tools→clearing (creative, skip tools)`);
         }
 
         if (this.phase === 'clearing') {
             const hasWrongBlocks = this.findWrongBlocks().length > 0;
             const floorComplete = this.isLevelComplete(0);
             if (!floorComplete) {
+                if (oldPhase !== 'floor') this.log(`PHASE: ${oldPhase}→floor progress=${progress.percent}%`);
                 this.phase = 'floor';
             } else if (hasWrongBlocks) {
                 this.phase = 'clearing';
             } else {
+                this.log(`PHASE: ${oldPhase}→walls progress=${progress.percent}%`);
                 this.phase = 'walls';
             }
         }
 
         if (this.phase === 'floor') {
             if (this.isLevelComplete(0)) {
+                this.log(`PHASE: floor→walls progress=${progress.percent}%`);
                 this.phase = 'walls';
             }
         }
@@ -220,12 +228,14 @@ export class BuildController {
                 }
             }
             if (wallsComplete) {
+                this.log(`PHASE: walls→roof progress=${progress.percent}%`);
                 this.phase = 'roof';
             }
         }
 
         if (this.phase === 'roof') {
             if (this.isLevelComplete(sy - 1)) {
+                this.log(`PHASE: roof→details progress=${progress.percent}%`);
                 this.phase = 'details';
             }
         }
@@ -233,6 +243,7 @@ export class BuildController {
         if (this.phase === 'details') {
             const wrong = this.findWrongBlocks();
             if (wrong.length === 0) {
+                this.log(`PHASE: details→done progress=${progress.percent}%`);
                 this.phase = 'done';
             }
         }

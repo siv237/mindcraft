@@ -188,6 +188,9 @@ export class Agent {
 
                 this.shut_up = false;
 
+                if (this.build_controller?.active) {
+                    this.build_controller.log(`PLAYER_MSG from ${username}: ${message}`);
+                }
                 console.log(this.name, 'received message from', username, ':', message);
 
                 if (convoManager.isOtherAgent(username)) {
@@ -397,6 +400,9 @@ export class Agent {
             let history = this.history.getHistory();
             let res = await this.prompter.promptConvo(history);
 
+            if (this.build_controller?.active) {
+                this.build_controller.log(`LLM_RESPONSE to ${source}: "${res.substring(0, 300)}"`);
+            }
             console.log(`${this.name} full response to ${source}: ""${res}""`);
 
             if (res.trim().length === 0) {
@@ -440,6 +446,9 @@ export class Agent {
                 let execute_res = await executeCommand(this, res);
 
                 console.log('Agent executed:', command_name, 'and got:', execute_res);
+                if (this.build_controller?.active) {
+                    this.build_controller.log(`CMD ${command_name} result: ${(execute_res || 'null').substring(0, 200)}`);
+                }
                 used_command = true;
 
                 if (execute_res)
