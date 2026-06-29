@@ -15,7 +15,7 @@ import { Vec3 } from 'vec3';
 import convoManager from './conversation.js';
 import { handleTranslation, handleEnglishTranslation } from '../utils/translator.js';
 import { addBrowserViewer } from './vision/browser_viewer.js';
-import { serverProxy, sendOutputToServer } from './mindserver_proxy.js';
+import { serverProxy, sendOutputToServer, sendLLMDialogToServer } from './mindserver_proxy.js';
 import settings from './settings.js';
 import { Task } from './tasks/tasks.js';
 import { speak } from './speak.js';
@@ -380,6 +380,7 @@ export class Agent {
         // Handle other user messages
         await this.history.add(source, message);
         this.history.save();
+        sendLLMDialogToServer(this.name, source, message);
 
         if (!self_prompt && this.self_prompter.isActive()) {
             await this.self_prompter.pause();
@@ -394,6 +395,7 @@ export class Agent {
                 this.build_controller.log(`LLM_RESPONSE to ${source}: "${res.substring(0, 300)}"`);
             }
             console.log(`${this.name} full response to ${source}: ""${res}""`);
+            sendLLMDialogToServer(this.name, this.name, res);
 
             if (res.trim().length === 0) {
                 console.warn('no response')
@@ -441,9 +443,10 @@ export class Agent {
                 }
                 used_command = true;
 
-                if (execute_res)
+                if (execute_res) {
                     this.history.add('system', execute_res);
-                else
+                    sendLLMDialogToServer(this.name, 'system', execute_res);
+                } else
                     break;
             }
             else { // conversation response

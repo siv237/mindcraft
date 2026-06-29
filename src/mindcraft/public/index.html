@@ -128,6 +128,26 @@
             text-overflow: ellipsis;
             width: 100%;
         }
+        .dialog-log {
+            grid-column: 1 / -1;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+        .dialog-entry { margin-bottom: 4px; padding: 3px 6px; border-radius: 3px; }
+        .dialog-entry .role { font-weight: bold; }
+        .dialog-entry.user .role { color: #6ab0f3; }
+        .dialog-entry.assistant .role { color: #5cb85c; }
+        .dialog-entry.system .role { color: #f0ad4e; }
+        .dialog-entry .content { color: #ccc; word-break: break-word; }
+        .dialog-entry .time { color: #666; font-size: 10px; }
         .start-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
@@ -660,6 +680,22 @@
             }
         });
 
+        const dialogLogs = {};
+        socket.on('llm-dialog', (agentName, data) => {
+            const logDiv = document.getElementById(`dialogLog-${agentName}`);
+            if (!logDiv) return;
+            if (!dialogLogs[agentName]) dialogLogs[agentName] = [];
+            const role = data.role === agentName ? 'assistant' : (data.role === 'system' ? 'system' : 'user');
+            const time = new Date(data.timestamp).toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `dialog-entry ${role}`;
+            const truncated = (data.content || '').substring(0, 500);
+            entry.innerHTML = `<span class="time">[${time}]</span> <span class="role">${data.role}:</span> <span class="content">${truncated.replace(/</g, '&lt;')}</span>`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            while (logDiv.children.length > 100) logDiv.removeChild(logDiv.firstChild);
+        });
+
         // Subscribe to aggregated state updates (re-sent on each connect)
         socket.on('state-update', (states) => {
             window.lastStates = states;
@@ -927,6 +963,7 @@
                                 <div class="inventory-grid" id="inventory-${agent.name}"></div>
                             </div>
                             <div id="lastMessage-${agent.name}" class="last-message" style="grid-column: 1 / -1;"><strong>Last Message:</strong> ${lastMessage}</div>
+                            <div class="dialog-log" id="dialogLog-${agent.name}"></div>
                         </div>
                         <div class="controls-row">
                             <button class="start-btn" id="sendBtn-${agent.name}" disabled onclick="sendMessage('${agent.name}', document.getElementById('messageInput-${agent.name}').value)">Send</button>

@@ -271,6 +271,10 @@ export function createMindServer(host_public = false, port = 8080) {
             io.emit('bot-output', agentName, message);
         });
 
+        socket.on('llm-dialog', (agentName, data) => {
+            io.emit('llm-dialog', agentName, data);
+        });
+
         socket.on('listen-to-agents', () => {
             addListener(socket);
         });

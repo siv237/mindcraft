@@ -8,10 +8,15 @@ export class Ollama {
         this.url = url || 'http://127.0.0.1:11434';
         this.chat_endpoint = '/api/chat';
         this.embedding_endpoint = '/api/embeddings';
-        this._busy = false;
+        this._requestInProgress = false;
     }
 
     async sendRequest(turns, systemMessage) {
+        while (this._requestInProgress) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+        this._requestInProgress = true;
+        try {
         let model = this.model_name || 'sweaterdog/andy-4:micro-q8_0';
         let messages = strictFormat(turns);
         messages.unshift({ role: 'system', content: systemMessage });
@@ -79,6 +84,9 @@ export class Ollama {
             finalRes = 'I thought too hard, sorry, try again.';
         }
         return finalRes;
+        } finally {
+            this._requestInProgress = false;
+        }
     }
 
     async embed(text) {
@@ -95,13 +103,6 @@ export class Ollama {
     }
 
     async send(endpoint, body) {
-        if (this._busy) {
-            console.warn('Ollama is busy, waiting for previous request to finish...');
-            while (this._busy) {
-                await new Promise(r => setTimeout(r, 500));
-            }
-        }
-        this._busy = true;
         const url = new URL(endpoint, this.url);
         let method = 'POST';
         let headers = new Headers();
@@ -109,7 +110,7 @@ export class Ollama {
         let data = null;
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 120000);
+            const timeout = setTimeout(() => controller.abort(), 60000);
             const res = await fetch(request, { signal: controller.signal });
             clearTimeout(timeout);
             if (res.ok) {
@@ -122,14 +123,12 @@ export class Ollama {
             }
         } catch (err) {
             if (err.name === 'AbortError') {
-                console.error('Ollama request timed out after 120s');
+                console.error('Ollama request timed out after 60s');
                 throw new Error('Ollama request timed out');
             }
             console.error('Failed to send Ollama request.');
             console.error(err);
             throw err;
-        } finally {
-            this._busy = false;
         }
         return data;
     }

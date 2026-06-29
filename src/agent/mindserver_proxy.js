@@ -131,3 +131,8 @@ export function sendBotChatToServer(agentName, json) {
 export function sendOutputToServer(agentName, message) {
     serverProxy.getSocket().emit('bot-output', agentName, message);
 }
+
+// for sending LLM dialog to server for display in web UI
+export function sendLLMDialogToServer(agentName, role, content) {
+    serverProxy.getSocket().emit('llm-dialog', agentName, { role, content, timestamp: Date.now() });
+}
