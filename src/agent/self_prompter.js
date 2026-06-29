@@ -9,7 +9,7 @@ export class SelfPrompter {
         this.interrupt = false;
         this.prompt = '';
         this.idle_time = 0;
-        this.cooldown = 2000;
+        this.cooldown = 500;
         this.build_controller = null;
     }
 
@@ -103,7 +103,7 @@ export class SelfPrompter {
                         this.state = STOPPED;
                         break;
                     }
-                } else if (action.type === 'place' || action.type === 'break') {
+                } else if (action.type === 'place' || action.type === 'break' || action.type === 'goto' || action.type === 'placeBatch') {
                     directAction = action;
                     msg = action.message;
                 } else {

@@ -613,13 +613,29 @@ export class BuildController {
             };
         }
 
-        const missing = this.findMissingBlocks(1);
+        const missing = this.findMissingBlocks(10);
         if (missing.length > 0) {
             const m = missing[0];
             const resolvedName = this.resolveBlockName(m.blueprintBlock);
             const haveCount = inv[resolvedName] || 0;
 
             if (isCreative || haveCount > 0) {
+                const batch = missing.filter(mb => {
+                    const rn = this.resolveBlockName(mb.blueprintBlock);
+                    return rn === resolvedName && (inv[rn] || 0) > 0;
+                }).slice(0, isCreative ? 10 : Math.min(haveCount, 10));
+                if (batch.length > 0) {
+                    return {
+                        type: 'placeBatch',
+                        done: false,
+                        blocks: batch.map(mb => ({
+                            worldPos: mb.worldPos,
+                            blockType: resolvedName,
+                            blueprintBlock: mb.blueprintBlock,
+                        })),
+                        message: this.formatPlaceAction(m, resolvedName, progress, posStr, siteStr),
+                    };
+                }
                 return {
                     type: 'place',
                     done: false,
@@ -696,6 +712,29 @@ export class BuildController {
     }
 
     async executeDirect(action) {
+        if (action.type === 'placeBatch') {
+            let placed = 0;
+            let failed = 0;
+            for (const blk of action.blocks) {
+                const wp = blk.worldPos;
+                const wpKey = `${wp.x},${wp.y},${wp.z}`;
+                if (this.verifiedBlocks.has(wpKey)) continue;
+                const actionFn = async () => {
+                    await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 4);
+                    await skills.placeBlock(this.bot, blk.blockType, wp.x, wp.y, wp.z);
+                };
+                const res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
+                if (res.message && (res.message.includes('Failed to place') || res.success === false)) {
+                    failed++;
+                    this.log(`BATCH PLACE FAILED at (${wp.x},${wp.y},${wp.z})`);
+                } else {
+                    placed++;
+                    this.verifiedBlocks.add(wpKey);
+                }
+            }
+            this.log(`BATCH: placed ${placed} blocks, ${failed} failed`);
+            return { success: failed === 0, message: `Placed ${placed} blocks in batch`, interrupted: false, timedout: false };
+        }
         if (action.type === 'goto') {
             const wp = action.worldPos;
             this.log(`GOTO build site at (${wp.x},${wp.y},${wp.z})`);
@@ -815,11 +854,11 @@ export class BuildController {
         if (!hasPickaxe) toolHint += `You have NO pickaxe. You will need one for stone. `;
         let gatherHint;
         if (havePlanks > 0) {
-            gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 1).`;
+            gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
         } else if (haveLogs > 0) {
-            gatherHint = `You already have ${haveLogs} oak_log. Craft planks first: !craftRecipe("oak_planks", 2). Then craft: !craftRecipe("${resolvedName}", 1).`;
+            gatherHint = `You already have ${haveLogs} oak_log. Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}). Then craft: !craftRecipe("${resolvedName}", 4).`;
         } else {
-            gatherHint = `Gather materials: !collectBlocks("oak_log", 5). Then craft: !craftRecipe("oak_planks", 2).`;
+            gatherHint = `Gather materials: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
         }
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
