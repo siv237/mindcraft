@@ -988,14 +988,49 @@ export class BuildController {
         if (!hasAxe) toolHint += `You have NO axe. Crafting one will speed up wood gathering a lot. `;
         if (!hasPickaxe) toolHint += `You have NO pickaxe. You will need one for stone. `;
         let gatherHint;
-        if (havePlanks > 0) {
-            gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
-        } else if (haveLogs > 0) {
-            gatherHint = `You already have ${haveLogs} oak_log. Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}). Then craft: !craftRecipe("${resolvedName}", 4).`;
+        const haveCobble = inv['cobblestone'] || 0;
+        const haveStoneBricks = inv['stone_bricks'] || 0;
+
+        if (resolvedName === 'cobblestone') {
+            if (haveCobble > 0) {
+                gatherHint = `You already have ${haveCobble} cobblestone. Ready to use.`;
+            } else {
+                gatherHint = `Mine stone with a pickaxe: !collectBlocks("stone", 30). Stone drops cobblestone when mined. Do NOT try to collect cobblestone directly.`;
+            }
+        } else if (resolvedName === 'stone_bricks') {
+            if (haveStoneBricks > 0) {
+                gatherHint = `You already have ${haveStoneBricks} stone_bricks. Ready to use.`;
+            } else if (haveCobble > 0) {
+                gatherHint = `Craft stone_bricks from cobblestone: !craftRecipe("stone_bricks", 10). You have ${haveCobble} cobblestone.`;
+            } else {
+                gatherHint = `Mine stone: !collectBlocks("stone", 30). Then craft: !craftRecipe("stone_bricks", 10).`;
+            }
+        } else if (resolvedName === 'oak_planks' || resolvedName === 'planks') {
+            if (havePlanks > 0) {
+                gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
+            } else if (haveLogs > 0) {
+                gatherHint = `Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}).`;
+            } else {
+                const totalNeeded = Object.values(needed).reduce((a, b) => a + b, 0);
+                gatherHint = `FIRST try to collect existing planks from old structures: !collectBlocks("oak_planks", ${Math.min(totalNeeded, 30)}). `;
+                gatherHint += `If none found, gather: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
+            }
+        } else if (resolvedName === 'oak_door' || resolvedName === 'door') {
+            if (inv['oak_door'] > 0) {
+                gatherHint = `You already have ${inv['oak_door']} oak_door. Ready to use.`;
+            } else if (havePlanks > 0) {
+                gatherHint = `Craft oak_door: !craftRecipe("oak_door", 2). You have ${havePlanks} planks.`;
+            } else {
+                gatherHint = `Gather: !collectBlocks("oak_log", 10). Craft planks: !craftRecipe("oak_planks", 4). Then craft: !craftRecipe("oak_door", 2).`;
+            }
         } else {
-            const totalNeeded = Object.values(needed).reduce((a, b) => a + b, 0);
-            gatherHint = `FIRST try to collect existing ${resolvedName} blocks nearby from old structures: !collectBlocks("${resolvedName}", ${Math.min(totalNeeded, 30)}). `;
-            gatherHint += `If none found, gather raw materials: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
+            if (havePlanks > 0) {
+                gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
+            } else if (haveLogs > 0) {
+                gatherHint = `Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}). Then craft: !craftRecipe("${resolvedName}", 4).`;
+            } else {
+                gatherHint = `Gather: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
+            }
         }
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
