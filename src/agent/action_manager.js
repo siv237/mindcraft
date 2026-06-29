@@ -26,8 +26,8 @@ export class ActionManager {
     async stop() {
         if (!this.executing) return;
         const timeout = setTimeout(() => {
-            this.agent.cleanKill('Code execution refused stop after 10 seconds. Killing process.');
-        }, 10000);
+            console.error('Code execution refused stop after 120 seconds. Forcing continue.');
+        }, 120000);
         while (this.executing) {
             this.agent.requestInterrupt();
             console.log('waiting for code to finish executing...');
@@ -74,9 +74,10 @@ export class ActionManager {
                     this.cancelResume(); // likely cause of repetition
                 }
                 if (this.recent_action_counter > 5) {
-                    console.error('Infinite action loop detected, shutting down.');
-                    this.agent.cleanKill('Infinite action loop detected, shutting down.');
-                    return { success: false, message: 'Infinite action loop detected, shutting down.', interrupted: false, timedout: false };
+                    console.error('Infinite action loop detected, pausing 10 seconds.');
+                    await new Promise(r => setTimeout(r, 10000));
+                    this.recent_action_counter = 0;
+                    return { success: false, message: 'Action loop paused.', interrupted: false, timedout: false };
                 }
             }
             this.last_action_time = Date.now();

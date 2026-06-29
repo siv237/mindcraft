@@ -23,6 +23,8 @@ const REVERSE_SMELTING = Object.fromEntries(
     Object.entries(SMELTING_MAP).map(([src, out]) => [out, src])
 );
 
+const UTILITY_BLOCKS = ['furnace', 'crafting_table', 'chest', 'barrel'];
+
 const PHASES = ['tools', 'clearing', 'floor', 'walls', 'roof', 'details', 'done'];
 
 export class BuildController {
@@ -38,6 +40,7 @@ export class BuildController {
         this.lastAction = null;
         this.queue = new BuildQueue(this);
         this.verifiedBlocks = new Set();
+        this.utilityPositions = {};
     }
 
     get bot() {
@@ -495,6 +498,7 @@ export class BuildController {
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current) continue;
             if (current.name === 'air' && cell.blueprintBlock !== 'air') continue;
+            if (UTILITY_BLOCKS.includes(current.name)) continue;
             if (!blockSatisfied(cell.blueprintBlock, current)) {
                 wrong.push({
                     x: cell.x, y: cell.y, z: cell.z,
@@ -611,6 +615,7 @@ export class BuildController {
             if (cell.blueprintBlock !== 'air') continue;
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current || current.name === 'air') continue;
+            if (UTILITY_BLOCKS.includes(current.name)) continue;
             clearable.push({
                 x: cell.x, y: cell.y, z: cell.z,
                 expected: cell.blueprintBlock,
@@ -785,26 +790,14 @@ export class BuildController {
                 }
 
                 const smeltSource = REVERSE_SMELTING[resolvedName];
-                const hasFurnace = (inv['furnace'] || 0) > 0 ||
-                    world.getNearestBlock(this.bot, 'furnace', 16) !== null;
-                const hasFuel = (inv['coal'] || 0) > 0 || (inv['charcoal'] || 0) > 0 ||
-                    (inv['oak_log'] || 0) > 0 || (inv['oak_planks'] || 0) > 0 ||
-                    (inv['stick'] || 0) >= 2;
-                if (smeltSource && (inv[smeltSource] || 0) > 0 && hasFurnace && hasFuel) {
-                    const missing = this.countMissingMaterials();
-                    const haveRaw = inv[smeltSource] || 0;
-                    const needCount = missing[resolvedName] || 1;
-                    const smeltCount = Math.min(haveRaw, needCount);
-                    this.log(`DIRECT SMELT: have ${haveRaw} ${smeltSource}, need ${needCount} ${resolvedName}, smelting ${smeltCount}`);
-                    return {
-                        type: 'smelt',
-                        done: false,
-                        source: smeltSource,
-                        target: resolvedName,
-                        count: smeltCount,
-                        message: this.formatGatherAction(m, resolvedName, progress, posStr, siteStr),
-                    };
-                }
+                const furnaceBlock = world.getNearestBlock(this.bot, 'furnace', 32);
+                const hasFurnace = (inv['furnace'] || 0) > 0 || furnaceBlock !== null;
+                if (furnaceBlock) this.utilityPositions.furnace = { x: furnaceBlock.position.x, y: furnaceBlock.position.y, z: furnaceBlock.position.z };
+                const fuelCount = (inv['coal'] || 0) * 8 + (inv['charcoal'] || 0) * 8 +
+                    (inv['oak_log'] || 0) * 1 + (inv['oak_planks'] || 0) * 1 +
+                    Math.floor((inv['stick'] || 0) / 2) * 1;
+                const missing = this.countMissingMaterials();
+                const needCount = missing[resolvedName] || 1;
 
                 return {
                     type: 'gather',
@@ -915,6 +908,7 @@ export class BuildController {
                 }
             }
             this.log(`BATCH: placed ${placed} blocks, ${failed} failed`);
+            this.saveState();
             return { success: failed === 0, message: `Placed ${placed} blocks in batch`, interrupted: false, timedout: false };
         }
         if (action.type === 'goto') {
@@ -966,6 +960,7 @@ export class BuildController {
                 this.verifyPlacement(wp, action.blockType);
                 this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
             }
+            this.saveState();
             return res;
         }
         if (action.type === 'break') {
@@ -981,15 +976,6 @@ export class BuildController {
             } else {
                 this.log(`BREAK OK at (${wp.x},${wp.y},${wp.z})`);
             }
-            return res;
-        }
-        if (action.type === 'smelt') {
-            this.log(`DIRECT SMELT ${action.source} → ${action.target} x${action.count}`);
-            const actionFn = async () => {
-                await skills.smeltItem(this.bot, action.source, action.count);
-            };
-            const res = await this.agent.actions.runAction('build:smelt', actionFn, { timeout: 120 });
-            this.log(`SMELT result: ${res.message?.substring(0, 100)}`);
             return res;
         }
         return null;
@@ -1063,7 +1049,8 @@ export class BuildController {
                 result.collect[k] = (result.collect[k] || 0) + v;
             });
             result.steps.push(...subPlan.steps);
-            result.steps.push(`!smeltItem("${smeltSource}", ${need})  [${need} ${smeltSource} → ${need} ${itemName} in furnace]`);
+            const smeltBatch = Math.min(need, 8);
+            result.steps.push(`!smeltItem("${smeltSource}", ${smeltBatch})  [${smeltBatch} ${smeltSource} → ${smeltBatch} ${itemName} in furnace, repeat ${Math.ceil(need / 8)}x]`);
             if (!inv['furnace']) result.collect['furnace'] = (result.collect['furnace'] || 0) + 1;
             return result;
         }
@@ -1136,13 +1123,15 @@ export class BuildController {
         const haveStr = plan.have > 0 ? ` (already have ${plan.have})` : '';
 
         const smeltSource = REVERSE_SMELTING[resolvedName];
-        const hasFurnace = (inv['furnace'] || 0) > 0 ||
-            world.getNearestBlock(this.bot, 'furnace', 16) !== null;
-        const hasFuel = (inv['coal'] || 0) > 0 || (inv['charcoal'] || 0) > 0 ||
-            (inv['oak_log'] || 0) > 0 || (inv['oak_planks'] || 0) > 0 ||
-            (inv['stick'] || 0) >= 2;
+        const furnaceBlock = world.getNearestBlock(this.bot, 'furnace', 32);
+        const hasFurnace = (inv['furnace'] || 0) > 0 || furnaceBlock !== null;
+        if (furnaceBlock) this.utilityPositions.furnace = { x: furnaceBlock.position.x, y: furnaceBlock.position.y, z: furnaceBlock.position.z };
+        const fuelCount = (inv['coal'] || 0) * 8 + (inv['charcoal'] || 0) * 8 +
+            (inv['oak_log'] || 0) * 1 + (inv['oak_planks'] || 0) * 1 +
+            Math.floor((inv['stick'] || 0) / 2) * 1;
 
         let extraSteps = [];
+        const smeltFailed = (this.smeltFailCount || 0) > 0;
         if (smeltSource && (inv[smeltSource] || 0) > 0 && !hasFurnace) {
             if ((inv['cobblestone'] || 0) >= 8) {
                 extraSteps.push(`!craftRecipe("furnace", 1)  [craft furnace from 8 cobblestone]`);
@@ -1151,13 +1140,14 @@ export class BuildController {
                 extraSteps.push(`!craftRecipe("furnace", 1)  [craft furnace from 8 cobblestone]`);
             }
         }
-        if (smeltSource && (inv[smeltSource] || 0) > 0 && !hasFuel) {
-            extraSteps.push(`!collectBlocks("oak_log", 4)  [fuel for furnace]`);
+        if (smeltSource && (inv[smeltSource] || 0) > 0 && (fuelCount < totalNeeded || smeltFailed)) {
+            const needFuel = Math.max(totalNeeded - fuelCount, 5);
+            extraSteps.push(`!collectBlocks("oak_log", ${Math.ceil(needFuel)})  [need ${needFuel} fuel for furnace]`);
         }
 
         const allSteps = [...extraSteps, ...plan.steps];
         const firstCollectStep = allSteps.find(s => s.includes('collectBlocks'));
-        const firstSmeltStep = allSteps.find(s => s.includes('smeltItem'));
+        const firstSmeltStep = smeltFailed ? null : allSteps.find(s => s.includes('smeltItem'));
         const firstCraftStep = allSteps.find(s => s.includes('craftRecipe'));
 
         let nextStep = '';
@@ -1205,6 +1195,8 @@ export class BuildController {
                 buildSite: this.buildSite,
                 phase: this.phase,
                 active: this.active,
+                verifiedBlocks: [...this.verifiedBlocks],
+                utilityPositions: this.utilityPositions,
             };
             writeFileSync(this.stateFile, JSON.stringify(data, null, 2));
         } catch (e) {
@@ -1226,7 +1218,10 @@ export class BuildController {
             this.buildSite = data.buildSite;
             this.phase = data.phase || 'clearing';
             this.active = data.active || false;
-            this.log(`RESTORE build '${data.blueprintName}' at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}`);
+            this.verifiedBlocks = new Set(data.verifiedBlocks || []);
+            this.utilityPositions = data.utilityPositions || {};
+            this.smeltFailCount = 0;
+            this.log(`RESTORE build '${data.blueprintName}' at (${data.buildSite.x}, ${data.buildSite.y}, ${data.buildSite.z}), phase: ${this.phase}, verified: ${this.verifiedBlocks.size} blocks`);
             return this.active;
         } catch (e) {
             console.error('Failed to load build state:', e);

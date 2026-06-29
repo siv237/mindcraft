@@ -90,16 +90,15 @@ export class Agent {
 
         this.bot = initBot(this.name);
         
-        // Connection Handler
+        // Connection Handler — never exit, always let agent_process restart
         const onDisconnect = (event, reason) => {
             if (this._disconnectHandled) return;
             this._disconnectHandled = true;
-
-            // Log and Analyze
-            // handleDisconnection handles logging to console and server
-            const { type } = handleDisconnection(this.name, reason);
-     
-            process.exit(1);
+            const { msg } = handleDisconnection(this.name, reason);
+            this.history.add('system', msg);
+            this.history.save();
+            console.error(`[disconnect] ${event}: ${msg}. Process will restart.`);
+            setTimeout(() => process.exit(1), 2000);
         };
         
         // Bind events
@@ -125,11 +124,11 @@ export class Agent {
             else
                 this.bot.chat(`/skin clear`);
         });
-		const spawnTimeoutDuration = settings.spawn_timeout;
+        const spawnTimeoutDuration = settings.spawn_timeout;
         const spawnTimeout = setTimeout(() => {
-            const msg = `Bot has not spawned after ${spawnTimeoutDuration} seconds. Exiting.`;
+            const msg = `Bot has not spawned after ${spawnTimeoutDuration} seconds. Restarting.`;
             log(this.name, msg);
-            process.exit(1);
+            setTimeout(() => process.exit(1), 2000);
         }, spawnTimeoutDuration * 1000);
         this.bot.once('spawn', async () => {
             try {
@@ -164,7 +163,7 @@ export class Agent {
 
             } catch (error) {
                 console.error('Error in spawn event:', error);
-                process.exit(0);
+                setTimeout(() => process.exit(1), 2000);
             }
         });
     }
@@ -302,11 +301,9 @@ export class Agent {
         if (!this.task || !this.task.agent_names) {
           return;
         }
-
         const missingPlayers = this.task.agent_names.filter(name => !this.bot.players[name]);
         if (missingPlayers.length > 0) {
-            console.log(`Missing players/bots: ${missingPlayers.join(', ')}`);
-            this.cleanKill('Not all required players/bots are present in the world. Exiting.', 4);
+            console.log(`Missing players/bots: ${missingPlayers.join(', ')}, continuing anyway`);
         }
     }
 

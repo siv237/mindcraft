@@ -123,7 +123,7 @@ const modes_list = [
                 say(agent, 'I\'m stuck!');
                 this.stuck_time = 0;
                 execute(this, agent, async () => {
-                    const crashTimeout = setTimeout(() => { agent.cleanKill("Got stuck and couldn't get unstuck") }, 10000);
+                    const crashTimeout = setTimeout(() => { console.error("Got stuck and couldn't get unstuck, retrying"); this.stuck_time = 0; }, 10000);
                     await skills.moveAway(bot, 5);
                     clearTimeout(crashTimeout);
                     say(agent, 'I\'m free.');
