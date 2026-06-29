@@ -857,9 +857,18 @@ export class BuildController {
                 const res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
                 if (res.message && (res.message.includes('Failed to place') || res.success === false)) {
                     failed++;
+                    this.failCount++;
                     this.log(`BATCH PLACE FAILED ${blk.blockType} at (${wp.x},${wp.y},${wp.z}): ${res.message?.substring(0, 80)}`);
+                    if (this.failCount >= 3) {
+                        this.log(`BATCH SKIP ${blk.blockType} at (${wp.x},${wp.y},${wp.z}) after ${this.failCount} failures`);
+                        this.verifiedBlocks.add(wpKey);
+                        this.verifyPlacement(wp, blk.blockType);
+                        this.failCount = 0;
+                        continue;
+                    }
                 } else {
                     placed++;
+                    this.failCount = 0;
                     this.verifiedBlocks.add(wpKey);
                     this.verifyPlacement(wp, blk.blockType);
                 }
