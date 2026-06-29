@@ -338,7 +338,9 @@ export class BuildController {
         const wrong = [];
         for (const cell of all) {
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
-            if (current && !blockSatisfied(cell.blueprintBlock, current)) {
+            if (!current) continue;
+            if (current.name === 'air' && cell.blueprintBlock !== 'air') continue;
+            if (!blockSatisfied(cell.blueprintBlock, current)) {
                 wrong.push({
                     x: cell.x, y: cell.y, z: cell.z,
                     expected: cell.blueprintBlock,
@@ -439,18 +441,15 @@ export class BuildController {
         const all = this.getAllBlocks();
         const clearable = [];
         for (const cell of all) {
+            if (cell.blueprintBlock !== 'air') continue;
             const { current } = this.scanBlock(cell.x, cell.y, cell.z);
             if (!current || current.name === 'air') continue;
-            if (!blockSatisfied(cell.blueprintBlock, current)) {
-                if (cell.blueprintBlock === 'air' && current.name !== 'air') {
-                    clearable.push({
-                        x: cell.x, y: cell.y, z: cell.z,
-                        expected: cell.blueprintBlock,
-                        actual: current.name,
-                        worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
-                    });
-                }
-            }
+            clearable.push({
+                x: cell.x, y: cell.y, z: cell.z,
+                expected: cell.blueprintBlock,
+                actual: current.name,
+                worldPos: this.getWorldPos(cell.x, cell.y, cell.z),
+            });
         }
         return clearable;
     }
