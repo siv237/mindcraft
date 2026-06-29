@@ -2,8 +2,26 @@ import { Vec3 } from 'vec3';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync, appendFileSync } from 'fs';
 import * as world from './library/world.js';
 import * as skills from './library/skills.js';
+import * as mc from '../utils/mcdata.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
 import { BuildQueue } from './build_queue.js';
+
+const SMELTING_MAP = {
+    'sand': 'glass',
+    'red_sand': 'red_glass',
+    'cobblestone': 'stone',
+    'raw_iron': 'iron_ingot',
+    'raw_gold': 'gold_ingot',
+    'raw_copper': 'copper_ingot',
+    'clay_ball': 'brick',
+    'netherrack': 'nether_brick',
+    'kelp': 'dried_kelp',
+    'cactus': 'green_dye',
+};
+
+const REVERSE_SMELTING = Object.fromEntries(
+    Object.entries(SMELTING_MAP).map(([src, out]) => [out, src])
+);
 
 const PHASES = ['tools', 'clearing', 'floor', 'walls', 'roof', 'details', 'done'];
 
@@ -975,6 +993,99 @@ export class BuildController {
             `Respond:`;
     }
 
+    getMaterialPlan(itemName, count, inv, _depth = 0) {
+        if (_depth > 6) return { collect: {}, steps: [], have: 0 };
+
+        inv = inv || this.getInventoryCounts();
+        const have = inv[itemName] || 0;
+        const need = Math.max(0, count - have);
+        if (need === 0) return { collect: {}, steps: [], have };
+
+        const result = { collect: {}, steps: [], have };
+
+        const recipes = mc.getItemCraftingRecipes(itemName);
+        if (recipes && recipes.length > 0) {
+            const [ingredients, craftResult] = recipes[0];
+            const craftedPerRecipe = craftResult.craftedCount;
+            const batchCount = Math.ceil(need / craftedPerRecipe);
+            const totalProduced = batchCount * craftedPerRecipe;
+
+            const stepParts = [];
+            for (const [ingName, ingCount] of Object.entries(ingredients)) {
+                const totalIng = ingCount * batchCount;
+                const subPlan = this.getMaterialPlan(ingName, totalIng, inv, _depth + 1);
+                Object.entries(subPlan.collect).forEach(([k, v]) => {
+                    result.collect[k] = (result.collect[k] || 0) + v;
+                });
+                result.steps.push(...subPlan.steps);
+                stepParts.push(`${totalIng} ${ingName}`);
+            }
+            result.steps.push(`!craftRecipe("${itemName}", ${batchCount})  [${stepParts.join(' + ')} → ${totalProduced} ${itemName}]`);
+            return result;
+        }
+
+        const smeltSource = REVERSE_SMELTING[itemName];
+        if (smeltSource) {
+            const subPlan = this.getMaterialPlan(smeltSource, need, inv, _depth + 1);
+            Object.entries(subPlan.collect).forEach(([k, v]) => {
+                result.collect[k] = (result.collect[k] || 0) + v;
+            });
+            result.steps.push(...subPlan.steps);
+            result.steps.push(`!smeltItem("${smeltSource}", ${need})  [${need} ${smeltSource} → ${need} ${itemName} in furnace]`);
+            if (!inv['furnace']) result.collect['furnace'] = (result.collect['furnace'] || 0) + 1;
+            return result;
+        }
+
+        if (itemName === 'cobblestone') {
+            result.collect['stone'] = (result.collect['stone'] || 0) + need;
+            result.steps.push(`!collectBlocks("stone", ${need})  [mine stone with pickaxe → drops cobblestone]`);
+            return result;
+        }
+
+        if (itemName === 'coal') {
+            result.collect['coal_ore'] = (result.collect['coal_ore'] || 0) + need;
+            result.steps.push(`!collectBlocks("coal_ore", ${need})  [mine coal_ore with pickaxe → drops coal]`);
+            return result;
+        }
+
+        if (itemName === 'stick') {
+            const subPlan = this.getMaterialPlan('oak_planks', Math.ceil(need / 4), inv, _depth + 1);
+            Object.entries(subPlan.collect).forEach(([k, v]) => {
+                result.collect[k] = (result.collect[k] || 0) + v;
+            });
+            result.steps.push(...subPlan.steps);
+            result.steps.push(`!craftRecipe("stick", ${Math.ceil(need / 4)})  [planks → sticks]`);
+            return result;
+        }
+
+        if (itemName === 'torch') {
+            const coalPlan = this.getMaterialPlan('coal', Math.ceil(need / 4), inv, _depth + 1);
+            const stickPlan = this.getMaterialPlan('stick', Math.ceil(need / 4), inv, _depth + 1);
+            Object.entries(coalPlan.collect).forEach(([k, v]) => { result.collect[k] = (result.collect[k] || 0) + v; });
+            Object.entries(stickPlan.collect).forEach(([k, v]) => { result.collect[k] = (result.collect[k] || 0) + v; });
+            result.steps.push(...coalPlan.steps, ...stickPlan.steps);
+            result.steps.push(`!craftRecipe("torch", ${Math.ceil(need / 4)})  [coal + sticks → torches]`);
+            return result;
+        }
+
+        result.collect[itemName] = (result.collect[itemName] || 0) + need;
+        result.steps.push(`!collectBlocks("${itemName}", ${need})  [gather from world]`);
+        return result;
+    }
+
+    formatMaterialPlan(itemName, count) {
+        const inv = this.getInventoryCounts();
+        const plan = this.getMaterialPlan(itemName, count, inv);
+        const haveStr = plan.have > 0 ? ` (already have ${plan.have})` : '';
+        const collectStr = Object.keys(plan.collect).length > 0
+            ? `RAW MATERIALS TO GATHER: ${Object.entries(plan.collect).map(([k, v]) => `${v}x ${k}`).join(', ')}.`
+            : `All raw materials already in inventory.`;
+        const stepsStr = plan.steps.length > 0
+            ? `STEPS:\n${plan.steps.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}`
+            : `Nothing to do — you have enough.`;
+        return `MATERIAL PLAN for ${count}x ${itemName}${haveStr}:\n${collectStr}\n${stepsStr}`;
+    }
+
     formatGatherAction(m, resolvedName, progress, posStr, siteStr) {
         const inv = this.getInventoryCounts();
         const isCreative = this.bot.game?.gameMode === 'creative';
@@ -987,67 +1098,34 @@ export class BuildController {
         }
         const needed = this.countMissingMaterials();
         const neededStr = Object.entries(needed).map(([k, v]) => `${v}x ${k}`).join(', ');
-        const haveLogs = inv['oak_log'] || 0;
-        const havePlanks = inv['oak_planks'] || 0;
+        const totalNeeded = needed[resolvedName] || 1;
+
+        const plan = this.getMaterialPlan(resolvedName, totalNeeded, inv);
+        const haveStr = plan.have > 0 ? ` (already have ${plan.have})` : '';
+        const collectStr = Object.keys(plan.collect).length > 0
+            ? `GATHER THESE: ${Object.entries(plan.collect).map(([k, v]) => `${v}x ${k}`).join(', ')}.`
+            : `All materials in inventory — just craft!`;
+        const stepsStr = plan.steps.length > 0
+            ? `STEPS (do in order):\n${plan.steps.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}`
+            : `Nothing to do.`;
+
         const axes = ['diamond_axe', 'iron_axe', 'stone_axe', 'golden_axe', 'wooden_axe'];
         const pickaxes = ['diamond_pickaxe', 'iron_pickaxe', 'stone_pickaxe', 'golden_pickaxe', 'wooden_pickaxe'];
         const hasAxe = axes.find(a => inv[a] > 0);
         const hasPickaxe = pickaxes.find(p => inv[p] > 0);
         let toolHint = '';
-        if (!hasAxe) toolHint += `You have NO axe. Crafting one will speed up wood gathering a lot. `;
-        if (!hasPickaxe) toolHint += `You have NO pickaxe. You will need one for stone. `;
-        let gatherHint;
-        const haveCobble = inv['cobblestone'] || 0;
-        const haveStoneBricks = inv['stone_bricks'] || 0;
+        if (!hasAxe) toolHint += `You have NO axe. `;
+        if (!hasPickaxe) toolHint += `You have NO pickaxe. `;
 
-        if (resolvedName === 'cobblestone') {
-            if (haveCobble > 0) {
-                gatherHint = `You already have ${haveCobble} cobblestone. Ready to use.`;
-            } else {
-                gatherHint = `Mine stone with a pickaxe: !collectBlocks("stone", 30). Stone drops cobblestone when mined. Do NOT try to collect cobblestone directly.`;
-            }
-        } else if (resolvedName === 'stone_bricks') {
-            if (haveStoneBricks > 0) {
-                gatherHint = `You already have ${haveStoneBricks} stone_bricks. Ready to use.`;
-            } else if (haveCobble > 0) {
-                gatherHint = `Craft stone_bricks from cobblestone: !craftRecipe("stone_bricks", 10). You have ${haveCobble} cobblestone.`;
-            } else {
-                gatherHint = `Mine stone: !collectBlocks("stone", 30). Then craft: !craftRecipe("stone_bricks", 10).`;
-            }
-        } else if (resolvedName === 'oak_planks' || resolvedName === 'planks') {
-            if (havePlanks > 0) {
-                gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
-            } else if (haveLogs > 0) {
-                gatherHint = `Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}).`;
-            } else {
-                const totalNeeded = Object.values(needed).reduce((a, b) => a + b, 0);
-                gatherHint = `FIRST try to collect existing planks from old structures: !collectBlocks("oak_planks", ${Math.min(totalNeeded, 30)}). `;
-                gatherHint += `If none found, gather: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
-            }
-        } else if (resolvedName === 'oak_door' || resolvedName === 'door') {
-            if (inv['oak_door'] > 0) {
-                gatherHint = `You already have ${inv['oak_door']} oak_door. Ready to use.`;
-            } else if (havePlanks > 0) {
-                gatherHint = `Craft oak_door: !craftRecipe("oak_door", 2). You have ${havePlanks} planks.`;
-            } else {
-                gatherHint = `Gather: !collectBlocks("oak_log", 10). Craft planks: !craftRecipe("oak_planks", 4). Then craft: !craftRecipe("oak_door", 2).`;
-            }
-        } else {
-            if (havePlanks > 0) {
-                gatherHint = `You already have ${havePlanks} oak_planks. Craft what you need: !craftRecipe("${resolvedName}", 4).`;
-            } else if (haveLogs > 0) {
-                gatherHint = `Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}). Then craft: !craftRecipe("${resolvedName}", 4).`;
-            } else {
-                gatherHint = `Gather: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
-            }
-        }
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
-            `You need ${resolvedName}. ${gatherHint}\n` +
+            `You need ${totalNeeded}x ${resolvedName}${haveStr}.\n` +
+            `${collectStr}\n${stepsStr}\n` +
             `${toolHint}` +
             `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. Do NOT discard materials. ` +
-            `The build controller will place blocks automatically. Only gather and craft. Respond:`;
+            `The build controller will place blocks automatically. Only gather, smelt and craft. ` +
+            `Follow the STEPS in order. Respond:`;
     }
 
     saveState() {

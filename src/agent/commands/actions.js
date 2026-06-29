@@ -681,4 +681,20 @@ export const actionsList = [
             await skills.useToolOn(agent.bot, tool_name, target);
         })
     },
+    {
+        name: '!craftPlan',
+        description: 'Get a step-by-step plan for obtaining an item: crafting, smelting, or gathering raw materials. Shows what you already have and what to collect.',
+        params: {
+            'item_name': { type: 'ItemName', description: 'The item you want to obtain.' },
+            'num': { type: 'int', description: 'How many you need.', domain: [1, Number.MAX_SAFE_INTEGER] }
+        },
+        perform: async function(agent, item_name, num) {
+            if (!agent.build_controller || !agent.build_controller.active) {
+                return `No active build. !craftPlan is only available during construction.`;
+            }
+            const plan = agent.build_controller.formatMaterialPlan(item_name, num || 1);
+            agent.build_controller.log(`CRAFTPLAN: ${item_name} x${num}`);
+            return plan;
+        }
+    },
 ];

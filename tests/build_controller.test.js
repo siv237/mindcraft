@@ -1,13 +1,19 @@
-import { describe, it, before, after, beforeEach } from 'node:test';
+import { describe, it, before, after, beforeEach, afterEach } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { BuildController } from '../src/agent/build_controller.js';
 import { readFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import minecraftData from 'minecraft-data';
+import settings from '../settings.js';
+import { initMcData } from '../src/utils/mcdata.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEST_DIR = join(__dirname, 'tmp_test');
 const BLUEPRINTS_DIR = join(__dirname, '..', 'blueprints');
+
+const MC_VERSION = settings.minecraft_version === 'auto' ? '1.21.6' : (settings.minecraft_version || '1.21.6');
+initMcData(MC_VERSION);
 
 function makeMockBot({ spawnPoint = { x: 100, y: 64, z: 200 }, position = { x: 105, y: 64, z: 205 }, gameMode = 'survival', blocks = {} } = {}) {
     const inv = {};
@@ -774,7 +780,8 @@ describe('Method integrity - all methods exist and are callable', () => {
         'findClearableBlocks', 'findSalvageBlocks', 'getInventoryCounts', 'resolveBlockName',
         'countNeededMaterials', 'countMissingMaterials', 'getToolAction', 'getNextAction',
         'executeDirect', 'formatClearAction', 'formatSalvageAction', 'formatPlaceAction',
-        'formatGatherAction', 'saveState', 'loadState', 'getWorldId', 'log',
+        'formatGatherAction', 'getMaterialPlan', 'formatMaterialPlan',
+        'saveState', 'loadState', 'getWorldId', 'log',
     ];
 
     for (const method of requiredMethods) {
@@ -807,7 +814,7 @@ describe('Method integrity - all methods exist and are callable', () => {
     it('Commands should have build-related commands', async () => {
         const { getCommand } = await import('../src/agent/commands/index.js');
         const commands = ['!startBuild', '!newBuild', '!checkBuild', '!listBlueprints', '!buildQueue',
-            '!goal', '!endGoal', '!stop', '!placeHere', '!discard', '!collectBlocks', '!craftRecipe'];
+            '!goal', '!endGoal', '!stop', '!placeHere', '!discard', '!collectBlocks', '!craftRecipe', '!craftPlan'];
         for (const cmd of commands) {
             const c = getCommand(cmd);
             assert.ok(c, `${cmd} command not found in commandMap`);
@@ -823,5 +830,128 @@ describe('Method integrity - all methods exist and are callable', () => {
             assert.ok(bp.size, 'blueprint should have size');
             assert.match(bp.size, /\d+x\d+x\d+/);
         }
+    });
+
+    it('getMaterialPlan should be a method', () => {
+        assert.strictEqual(typeof bc.getMaterialPlan, 'function');
+    });
+
+    it('formatMaterialPlan should be a method', () => {
+        assert.strictEqual(typeof bc.formatMaterialPlan, 'function');
+    });
+
+    it('!craftPlan command should exist', async () => {
+        const { getCommand } = await import('../src/agent/commands/index.js');
+        const c = getCommand('!craftPlan');
+        assert.ok(c, '!craftPlan command not found');
+        assert.strictEqual(typeof c.perform, 'function');
+    });
+});
+
+describe('getMaterialPlan - craft chain resolution', () => {
+    let bc;
+
+    before(() => {
+        const agent = makeMockAgent();
+        bc = new BuildController(agent);
+    });
+
+    it('should return empty plan when already have enough', () => {
+        const inv = { oak_planks: 10 };
+        const plan = bc.getMaterialPlan('oak_planks', 5, inv);
+        assert.strictEqual(plan.have, 10);
+        assert.strictEqual(Object.keys(plan.collect).length, 0);
+        assert.strictEqual(plan.steps.length, 0);
+    });
+
+    it('should plan crafting oak_planks from oak_log', () => {
+        const inv = { oak_log: 5 };
+        const plan = bc.getMaterialPlan('oak_planks', 10, inv);
+        assert.ok(plan.collect['oak_log'] > 0 || plan.steps.length > 0);
+        const hasCraftStep = plan.steps.some(s => s.includes('craftRecipe') && s.includes('oak_planks'));
+        assert.ok(hasCraftStep, 'should have craft step for oak_planks');
+    });
+
+    it('should plan collecting oak_log when nothing in inventory', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('oak_planks', 10, inv);
+        const hasCollect = plan.steps.some(s => s.includes('collectBlocks') && (s.includes('oak_log') || s.includes('log')));
+        assert.ok(hasCollect, 'should have collect step for logs, got: ' + JSON.stringify(plan.steps));
+    });
+
+    it('should plan smelting sand for glass', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('glass', 8, inv);
+        assert.ok(plan.collect['sand'] > 0, 'should need sand');
+        const hasSmelt = plan.steps.some(s => s.includes('smeltItem') && s.includes('sand'));
+        assert.ok(hasSmelt, 'should have smelt step for sand→glass');
+    });
+
+    it('should plan mining stone for cobblestone', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('cobblestone', 20, inv);
+        assert.ok(plan.collect['stone'] >= 20, 'should need stone');
+        const hasMine = plan.steps.some(s => s.includes('collectBlocks') && s.includes('stone'));
+        assert.ok(hasMine, 'should have collect step for stone');
+    });
+
+    it('should plan crafting stone_bricks from cobblestone', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('stone_bricks', 10, inv);
+        const hasCraftStep = plan.steps.some(s => s.includes('craftRecipe') && s.includes('stone_bricks'));
+        assert.ok(hasCraftStep, 'should have craft step for stone_bricks');
+        assert.ok(plan.collect['stone'] > 0, 'should need stone (for cobblestone)');
+    });
+
+    it('should plan crafting torch from coal and sticks', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('torch', 4, inv);
+        const hasCoalCollect = plan.collect['coal_ore'] > 0;
+        const hasTorchCraft = plan.steps.some(s => s.includes('craftRecipe') && s.includes('torch'));
+        assert.ok(hasCoalCollect || hasTorchCraft, 'should plan coal collection and torch crafting');
+    });
+
+    it('should plan crafting oak_door from planks', () => {
+        const inv = { oak_planks: 10 };
+        const plan = bc.getMaterialPlan('oak_door', 2, inv);
+        const hasCraftStep = plan.steps.some(s => s.includes('craftRecipe') && s.includes('oak_door'));
+        assert.ok(hasCraftStep, 'should have craft step for oak_door');
+    });
+
+    it('should use existing cobblestone when crafting stone_bricks', () => {
+        const inv = { cobblestone: 20 };
+        const plan = bc.getMaterialPlan('stone_bricks', 10, inv);
+        assert.ok(plan.have >= 0, 'should have some from inventory');
+        const hasCraftStep = plan.steps.some(s => s.includes('craftRecipe') && s.includes('stone_bricks'));
+        assert.ok(hasCraftStep, 'should have craft step for stone_bricks');
+        assert.ok(!plan.collect['stone'], 'should NOT need to mine stone when has cobblestone');
+    });
+
+    it('should add furnace to collect list when smelting and no furnace', () => {
+        const inv = {};
+        const plan = bc.getMaterialPlan('glass', 8, inv);
+        assert.ok(plan.collect['furnace'] >= 1, 'should need furnace');
+    });
+
+    it('should not add furnace when already has one', () => {
+        const inv = { furnace: 1 };
+        const plan = bc.getMaterialPlan('glass', 8, inv);
+        assert.ok(!plan.collect['furnace'], 'should NOT need furnace when has one');
+    });
+
+    it('formatMaterialPlan should produce readable text', () => {
+        const inv = {};
+        const text = bc.formatMaterialPlan('glass', 8);
+        assert.match(text, /glass/);
+        assert.match(text, /sand/);
+        assert.match(text, /smeltItem/);
+        assert.match(text, /STEPS/);
+    });
+
+    it('formatMaterialPlan should show already-have count', () => {
+        bc.bot._inv['oak_planks'] = 20;
+        bc.getInventoryCounts = () => ({ oak_planks: 20 });
+        const text = bc.formatMaterialPlan('oak_planks', 10);
+        assert.match(text, /already have/);
     });
 });

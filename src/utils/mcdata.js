@@ -132,6 +132,14 @@ export function initBot(username) {
     return bot;
 }
 
+export function initMcData(version) {
+    if (!mcdata) {
+        mc_version = version;
+        mcdata = minecraftData(mc_version);
+        Item = prismarine_items(mc_version);
+    }
+}
+
 export function isHuntable(mob) {
     if (!mob || !mob.name) return false;
     const animals = ['chicken', 'cow', 'llama', 'mooshroom', 'pig', 'rabbit', 'sheep'];
