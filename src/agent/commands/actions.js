@@ -401,6 +401,9 @@ export const actionsList = [
                 }
                 return msg;
             }
+            if (!near_player && agent.last_sender && agent.last_sender !== 'system') {
+                near_player = agent.last_sender;
+            }
             let position = null;
             if (near_player) {
                 const player = agent.bot.players[near_player];
@@ -409,7 +412,7 @@ export const actionsList = [
                     position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
                     agent.openChat(`Building '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
                 } else {
-                    return `Player '${near_player}' not found or too far away. Build at my position instead? Use !startBuild("${blueprint_name}").`;
+                    return `Player '${near_player}' not found or too far away. Ask them to come closer.`;
                 }
             }
             agent.build_controller.switchTo(blueprint_name, position);
@@ -441,6 +444,9 @@ export const actionsList = [
             }
             agent.build_controller.queue.tasks = [];
             agent.build_controller.queue.save();
+            if (!near_player && agent.last_sender && agent.last_sender !== 'system') {
+                near_player = agent.last_sender;
+            }
             let position = null;
             if (near_player) {
                 const player = agent.bot.players[near_player];
@@ -449,7 +455,7 @@ export const actionsList = [
                     position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
                     agent.openChat(`Building NEW '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
                 } else {
-                    return `Player '${near_player}' not found or too far away. Build at my position instead? Use !newBuild("${blueprint_name}").`;
+                    return `Player '${near_player}' not found or too far away. Ask them to come closer.`;
                 }
             }
             agent.build_controller.start(blueprint_name, position);
