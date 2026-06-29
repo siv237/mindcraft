@@ -1,0 +1,61 @@
+{
+    "name": "mine_entrance",
+    "description": "Large vaulted mine entrance with arch, cobblestone supports, torches, chests for storage, furnace and crafting table. 7x7x6",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "air", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "chest", "air", "air", "air", "furnace", "cobblestone"],
+            ["cobblestone", "torch", "air", "air", "air", "torch", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "chest", "air", "crafting_table", "air", "chest", "cobblestone"],
+            ["cobblestone", "torch", "air", "air", "air", "torch", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "air", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "air", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "air", "air", "air", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ]
+    ]
+}

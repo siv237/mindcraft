@@ -4,6 +4,11 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { readFileSync } from 'fs';
 
+const _origLog = console.log;
+const _origErr = console.error;
+console.log = (...args) => _origLog(`[${new Date().toISOString()}]`, ...args);
+console.error = (...args) => _origErr(`[${new Date().toISOString()}]`, ...args);
+
 function parseArguments() {
     return yargs(hideBin(process.argv))
         .option('profiles', {

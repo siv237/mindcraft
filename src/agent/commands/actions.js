@@ -382,7 +382,7 @@ export const actionsList = [
     },
     {
         name: '!listBlueprints',
-        description: 'List all available building blueprints with their sizes and materials.',
+        description: 'List available blueprints.',
         perform: function (agent) {
             if (!agent.build_controller) {
                 agent.build_controller = new BuildController(agent);
@@ -400,10 +400,10 @@ export const actionsList = [
     },
     {
         name: '!startBuild',
-        description: 'Start building a structure from a blueprint. The bot will continuously scan, gather materials, and place blocks until the structure is complete.',
+        description: 'Build a structure. Finds blueprint, asks confirmation, then builds. Use !listBlueprints to see names.',
         params: {
-            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5, watchtower, lighthouse).' },
-            'near_player': { type: 'string', description: 'Player name to build near. Bot will build at that player position. Optional.', optional: true },
+            'blueprint_name': { type: 'string', description: 'Blueprint name (house_5x5, mine_entrance, etc).' },
+            'near_player': { type: 'string', description: 'Player to build near. Optional.', optional: true },
         },
         perform: async function (agent, blueprint_name, near_player) {
             if (!agent.build_controller) {
@@ -429,43 +429,25 @@ export const actionsList = [
                 if (player && player.entity) {
                     const pos = player.entity.position;
                     position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
-                    agent.openChat(`Building '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
                 } else {
                     return `Player '${near_player}' not found or too far away. Ask them to come closer.`;
                 }
             }
-            const result = agent.build_controller.switchTo(blueprint_name, position);
-            if (result === false) {
-                return `Cannot build '${blueprint_name}' here — overlaps with an existing structure. Use !buildQueue to see existing builds, or !demolish to remove one.`;
-            }
-            const progress = agent.build_controller.computeProgress();
-            const site = agent.build_controller.buildSite;
-            const queueLen = agent.build_controller.queue.tasks.length;
-            let msg = `Started building '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
-            msg += `Progress: ${progress.percent}%. Queue: ${queueLen} tasks.`;
-            if (agent.self_prompter.isActive()) {
-                await agent.self_prompter.stop(false);
-            }
-            agent.self_prompter.startBuildLoop(agent.build_controller);
-            return msg;
+            const result = agent.build_controller.prepareBuild(blueprint_name, position, agent.last_sender);
+            return result.error || result.message;
         }
     },
     {
         name: '!newBuild',
-        description: 'Start a NEW building at current position or near a player, abandoning any previous build.',
+        description: 'Start NEW build, abandoning old. Finds blueprint, asks confirmation.',
         params: {
-            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5, watchtower, lighthouse).' },
-            'near_player': { type: 'string', description: 'Player name to build near. Bot will build at that player position. Optional.', optional: true },
+            'blueprint_name': { type: 'string', description: 'Blueprint name (house_5x5, mine_entrance, etc).' },
+            'near_player': { type: 'string', description: 'Player to build near. Optional.', optional: true },
         },
         perform: async function (agent, blueprint_name, near_player) {
             if (!agent.build_controller) {
                 agent.build_controller = new BuildController(agent);
             }
-            if (agent.build_controller.active) {
-                agent.build_controller.stop();
-            }
-            agent.build_controller.queue.tasks = [];
-            agent.build_controller.queue.save();
             if (!near_player && agent.last_sender && agent.last_sender !== 'system') {
                 near_player = agent.last_sender;
             }
@@ -475,36 +457,78 @@ export const actionsList = [
                 if (player && player.entity) {
                     const pos = player.entity.position;
                     position = { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) };
-                    agent.openChat(`Building NEW '${blueprint_name}' near ${near_player} at (${position.x}, ${position.y}, ${position.z}).`);
                 } else {
                     return `Player '${near_player}' not found or too far away. Ask them to come closer.`;
                 }
             }
-            agent.build_controller.start(blueprint_name, position);
-            const progress = agent.build_controller.computeProgress();
-            const site = agent.build_controller.buildSite;
-            let msg = `Started NEW build '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
-            msg += `Progress: ${progress.percent}%.`;
+            const result = agent.build_controller.prepareBuild(blueprint_name, position, agent.last_sender);
+            return result.error || result.message;
+        }
+    },
+    {
+        name: '!confirmBuild',
+        description: 'Confirm pending build after !startBuild/!newBuild asks.',
+        perform: async function (agent) {
+            if (!agent.build_controller) return 'No build controller.';
+            const result = agent.build_controller.confirmBuild();
+            if (result.error) return result.error;
             if (agent.self_prompter.isActive()) {
-                await agent.self_prompter.stop();
+                await agent.self_prompter.stop(false);
             }
             agent.self_prompter.startBuildLoop(agent.build_controller);
-            return msg;
+            return result.message;
+        }
+    },
+    {
+        name: '!cancelBuild',
+        description: 'Cancel pending build.',
+        perform: function (agent) {
+            if (!agent.build_controller) return 'No build controller.';
+            const result = agent.build_controller.cancelBuild();
+            return result.error || result.message;
         }
     },
     {
         name: '!demolish',
-        description: 'Demolish a completed building so a new one can be built in its place. Use !buildQueue to find the task ID.',
+        description: 'Remove a build by name or ID. Use !buildQueue to find.',
         params: {
-            'task_id': { type: 'string', description: 'The task ID from !buildQueue.' },
+            'task_id_or_name': { type: 'string', description: 'Build name (e.g. "дом на горе") or task ID.' },
         },
-        perform: async function (agent, task_id) {
+        perform: async function (agent, task_id_or_name) {
             if (!agent.build_controller) return 'No build controller.';
-            const task = agent.build_controller.demolish(task_id);
-            if (task) {
-                return `Demolished '${task.blueprintName}' at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z}). You can now build something new there.`;
+            const queue = agent.build_controller.queue;
+            queue.load();
+            let task = queue.tasks.find(t => t.id === task_id_or_name);
+            if (!task) task = queue.findByName(task_id_or_name);
+            if (!task) {
+                return `Build '${task_id_or_name}' not found. Use !buildQueue to see all builds with their names and IDs.`;
             }
-            return `Task '${task_id}' not found. Use !buildQueue to see task IDs.`;
+            const removed = agent.build_controller.demolish(task.id);
+            if (removed) {
+                const name = removed.buildName ? `"${removed.buildName}" ` : '';
+                return `Demolished ${name}${removed.blueprintName} at (${removed.buildSite.x},${removed.buildSite.y},${removed.buildSite.z}). You can now build something new there.`;
+            }
+            return `Could not demolish '${task_id_or_name}'.`;
+        }
+    },
+    {
+        name: '!findBuild',
+        description: 'Find build by name (e.g. "дом", "маяк", "шахта").',
+        params: {
+            'query': { type: 'string', description: 'Name or partial name.' },
+        },
+        perform: function (agent, query) {
+            if (!agent.build_controller) return 'No build controller.';
+            const queue = agent.build_controller.queue;
+            queue.load();
+            const task = queue.findByName(query);
+            if (!task) {
+                return `No build matching '${query}' found. Use !buildQueue or !allBuilds to see all builds.`;
+            }
+            const icon = task.status === 'active' ? '[ACTIVE]' : task.status === 'paused' ? '[PAUSED]' : '[DONE]';
+            const name = task.buildName ? `"${task.buildName}" ` : '';
+            const by = task.orderedBy ? ` ordered by ${task.orderedBy}` : '';
+            return `${icon} ${name}${task.blueprintName} at (${task.buildSite.x},${task.buildSite.y},${task.buildSite.z})${by}. id=${task.id}`;
         }
     },
     {
@@ -519,19 +543,28 @@ export const actionsList = [
                 if (!agent.self_prompter.isActive()) {
                     agent.self_prompter.startBuildLoop(agent.build_controller);
                 }
-                return `Found damaged '${damaged.blueprintName}' at (${damaged.buildSite.x},${damaged.buildSite.y},${damaged.buildSite.z}). Starting repair.`;
+                const name = damaged.buildName ? `"${damaged.buildName}" ` : '';
+                return `Found damaged ${name}${damaged.blueprintName} at (${damaged.buildSite.x},${damaged.buildSite.y},${damaged.buildSite.z}). Starting repair.`;
             }
             return 'All completed builds are intact. No repairs needed.';
         }
     },
     {
         name: '!buildQueue',
-        description: 'Show all build tasks in the queue with their status and coordinates.',
+        description: 'Show all build tasks in the queue with their status, coordinates, and progress.',
         perform: function (agent) {
             if (!agent.build_controller) return 'No build controller.';
             const queue = agent.build_controller.queue;
             queue.load();
             return queue.summary();
+        }
+    },
+    {
+        name: '!allBuilds',
+        description: 'Show all builds across ALL worlds with their status and progress.',
+        perform: function (agent) {
+            if (!agent.build_controller) return 'No build controller.';
+            return agent.build_controller.queue.summaryAllWorlds(agent.name);
         }
     },
     {

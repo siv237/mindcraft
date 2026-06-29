@@ -1,6 +1,7 @@
 import { getBlockId, getItemId, getItemCraftingRecipes } from "../../utils/mcdata.js";
 import { actionsList } from './actions.js';
 import { queryList } from './queries.js';
+import { readdirSync, existsSync } from 'fs';
 
 let suppressNoDomainWarning = true;
 
@@ -231,10 +232,31 @@ export async function executeCommand(agent, message) {
                 return 'Blocks are placed automatically by the build controller. You do NOT need to place anything. If you need materials, use !collectBlocks or !craftRecipe. Do NOT discard materials.';
             }
             if (parsed.commandName === '!discard' && agent.build_controller?.active) {
-                return 'Do NOT discard materials during building. You need them for construction. If the build controller needs blocks, it will ask you to gather or craft. Wait for the next build controller instruction.';
+                const itemName = parsed.args?.[0];
+                const buildMats = agent.build_controller.countNeededMaterials();
+                const isBuildMaterial = itemName && buildMats[itemName] > 0;
+                if (isBuildMaterial) {
+                    return `Do NOT discard ${itemName} — it is needed for building. If inventory is full, use !putInChest("${itemName}", count) to store it in a chest, or !viewChest to check chest contents.`;
+                }
             }
-            if ((parsed.commandName === '!stop' || parsed.commandName === '!endGoal' || parsed.commandName === '!stfu') && agent.build_controller?.active) {
-                return `Cannot stop during building. The build controller is active. Use !newBuild to start a new build or ask the player to stop you.`;
+            if (parsed.commandName === '!stop' && agent.build_controller?.active) {
+                agent.build_controller.stop();
+                if (agent.self_prompter.isActive()) {
+                    agent.self_prompter.stopLoop();
+                    agent.self_prompter.state = 0;
+                }
+                return 'Build stopped. All build tasks are paused. Use !startBuild to resume or start a new build.';
+            }
+            if (parsed.commandName === '!endGoal' && agent.build_controller?.active) {
+                agent.build_controller.stop();
+                if (agent.self_prompter.isActive()) {
+                    agent.self_prompter.stopLoop();
+                    agent.self_prompter.state = 0;
+                }
+                return 'Build stopped. All build tasks are paused.';
+            }
+            if (parsed.commandName === '!stfu' && agent.build_controller?.active) {
+                return 'Cannot shut up during building. Use !stop to stop the build first.';
             }
             if (parsed.commandName === '!craftRecipe' && agent.build_controller?.active) {
                 const itemName = parsed.args?.[0];
@@ -279,8 +301,19 @@ export function getCommandDocs(agent) {
     let docs = `\n*COMMAND DOCS\n You can use the following commands to perform actions and get information about the world. 
     Use the commands with the syntax: !commandName or !commandName("arg1", 1.2, ...) if the command takes arguments.\n
     Do not use codeblocks. Use double quotes for strings. Only use one command in each response, trailing commands and comments will be ignored.\n`;
+    const buildCommands = new Set(['!listBlueprints','!startBuild','!newBuild','!confirmBuild','!cancelBuild','!demolish','!findBuild','!repairAll','!buildQueue','!allBuilds','!checkBuild','!checkUtilities','!craftPlan']);
+    let buildDocs = '';
     for (let command of commandList) {
-        if (agent.blocked_actions.includes(command.name)) {
+        if (agent.blocked_actions.includes(command.name)) continue;
+        if (buildCommands.has(command.name)) {
+            buildDocs += command.name + ': ' + command.description + '\n';
+            if (command.params) {
+                for (let param in command.params) {
+                    const p = command.params[param];
+                    const opt = p.optional ? ' (optional)' : '';
+                    buildDocs += `  ${param}: ${p.description}${opt}\n`;
+                }
+            }
             continue;
         }
         docs += command.name + ': ' + command.description + '\n';
@@ -293,5 +326,6 @@ export function getCommandDocs(agent) {
             }
         }
     }
+    docs += `\nBUILD COMMANDS (blueprints: house_5x5, mine_entrance, small_wood_house, small_stone_house, stone_brick_house, large_house, watchtower, lighthouse, bridge, church, farm_hut, storage_shed, wall_7x7, dirt_shelter, cobblestone_tower):\n` + buildDocs;
     return docs + '*\n';
 }

@@ -284,15 +284,7 @@ export class Agent {
                 console.log(`Build already active for world ${this.build_controller.getWorldId()} at (${this.build_controller.buildSite.x},${this.build_controller.buildSite.y},${this.build_controller.buildSite.z}). Resuming.`);
                 this.self_prompter.startBuildLoop(this.build_controller);
             } else {
-                console.log(`Auto-starting with goal: ${settings.auto_goal}`);
-                if (settings.auto_goal.startsWith('!startBuild')) {
-                    const match = settings.auto_goal.match(/!startBuild\("?(\w+)"?\)/);
-                    const blueprintName = match ? match[1] : 'house_5x5';
-                    this.build_controller.start(blueprintName);
-                    this.self_prompter.startBuildLoop(this.build_controller);
-                } else {
-                    this.self_prompter.start(settings.auto_goal);
-                }
+                console.log('No active build to resume. Waiting for user instructions.');
             }
         }
     }
@@ -463,9 +455,9 @@ export class Agent {
             this.history.save();
         }
 
-        if (this.self_prompter.isPaused() && !convoManager.inConversation()) {
+        if ((this.self_prompter.isPaused() || (this.self_prompter.isStopped() && this.build_controller?.active)) && !convoManager.inConversation()) {
             setTimeout(() => {
-                if (this.self_prompter.isPaused() && !convoManager.inConversation()) {
+                if ((this.self_prompter.isPaused() || (this.self_prompter.isStopped() && this.build_controller?.active)) && !convoManager.inConversation()) {
                     console.log('Resuming self-prompting after player interaction...');
                     if (this.build_controller && this.build_controller.active) {
                         this.self_prompter.startBuildLoop(this.build_controller);

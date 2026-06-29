@@ -421,16 +421,26 @@ describe('mcserver discoverLanServer', () => {
 });
 
 describe('Command blocking', () => {
-    it('should block !stop and !endGoal during active build', async () => {
+    it('should stop build when !stop is called during active build', async () => {
         const { executeCommand } = await import('../src/agent/commands/index.js');
         const mockAgent = {
-            build_controller: { active: true },
+            build_controller: { active: true, stop: () => {} },
             blocked_actions: [],
+            self_prompter: { isActive: () => false },
         };
         const stopResult = await executeCommand(mockAgent, '!stop');
-        assert.match(stopResult, /Cannot/);
+        assert.match(stopResult, /Build stopped/);
+    });
+
+    it('should stop build when !endGoal is called during active build', async () => {
+        const { executeCommand } = await import('../src/agent/commands/index.js');
+        const mockAgent = {
+            build_controller: { active: true, stop: () => {} },
+            blocked_actions: [],
+            self_prompter: { isActive: () => false },
+        };
         const endGoalResult = await executeCommand(mockAgent, '!endGoal');
-        assert.match(endGoalResult, /Cannot/);
+        assert.match(endGoalResult, /Build stopped/);
     });
 
     it('should allow commands when build is not active', async () => {

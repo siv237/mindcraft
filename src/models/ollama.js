@@ -27,7 +27,15 @@ export class Ollama {
                     model: model,
                     messages: messages,
                     stream: false,
-                    ...(this.params || {})
+                    think: this.params?.think,
+                    options: {
+                        temperature: this.params?.temperature,
+                        top_k: this.params?.top_k,
+                        top_p: this.params?.top_p,
+                        repeat_penalty: this.params?.repeat_penalty,
+                        num_ctx: this.params?.num_ctx,
+                        num_predict: this.params?.num_predict,
+                    }
                 });
                 if (apiResponse) {
                     res = apiResponse['message']['content'] || '';
@@ -95,11 +103,15 @@ export class Ollama {
             if (res.ok) {
                 data = await res.json();
             } else {
-                throw new Error(`Ollama Status: ${res.status}`);
+                const errorBody = await res.text().catch(() => '');
+                const err = new Error(`Ollama Status: ${res.status}: ${errorBody.substring(0, 200)}`);
+                err.statusCode = res.status;
+                throw err;
             }
         } catch (err) {
             console.error('Failed to send Ollama request.');
             console.error(err);
+            throw err;
         }
         return data;
     }

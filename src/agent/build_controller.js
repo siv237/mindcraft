@@ -5,6 +5,7 @@ import * as skills from './library/skills.js';
 import * as mc from '../utils/mcdata.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
 import { BuildQueue } from './build_queue.js';
+import { BLUEPRINT_TYPE_NAMES, generateBuildName } from './build_names.js';
 
 const SMELTING_MAP = {
     'sand': 'glass',
@@ -38,6 +39,9 @@ export class BuildController {
         this.worldId = null;
         this.failCount = 0;
         this.lastAction = null;
+        this.orderedBy = null;
+        this.buildName = null;
+        this.pendingBuild = null;
         this.queue = new BuildQueue(this);
         this.verifiedBlocks = new Set();
         this.utilityPositions = {};
@@ -88,20 +92,46 @@ export class BuildController {
         return this.worldId;
     }
 
-    loadBlueprint(name) {
+    resolveBlueprintName(name) {
         const paths = [
             `./blueprints/${name}.json`,
             `./src/agent/npc/construction/${name}.json`,
         ];
         for (const p of paths) {
+            if (existsSync(p)) return name;
+        }
+        const candidates = this.listBlueprints().map(bp => bp.name);
+        const lower = name.toLowerCase();
+        let match = candidates.find(c => c === lower) ||
+            candidates.find(c => c.startsWith(lower)) ||
+            candidates.find(c => c.includes(lower)) ||
+            candidates.find(c => lower.includes(c));
+        if (match) {
+            this.log(`BLUEPRINT FUZZY: '${name}' → '${match}'`);
+            return match;
+        }
+        return null;
+    }
+
+    loadBlueprint(name) {
+        const resolved = this.resolveBlueprintName(name);
+        if (!resolved) {
+            const available = this.listBlueprints().map(bp => bp.name).join(', ');
+            throw new Error(`Blueprint '${name}' not found in blueprints/ or npc/construction/. Available: ${available}`);
+        }
+        const paths = [
+            `./blueprints/${resolved}.json`,
+            `./src/agent/npc/construction/${resolved}.json`,
+        ];
+        for (const p of paths) {
             if (existsSync(p)) {
                 const data = JSON.parse(readFileSync(p, 'utf8'));
                 this.blueprint = data;
-                console.log(`Loaded blueprint: ${data.name || name} from ${p}`);
+                console.log(`Loaded blueprint: ${data.name || resolved} from ${p}`);
                 return data;
             }
         }
-        throw new Error(`Blueprint '${name}' not found in blueprints/ or npc/construction/`);
+        throw new Error(`Blueprint '${resolved}' not found in blueprints/ or npc/construction/`);
     }
 
     listBlueprints() {
@@ -136,8 +166,66 @@ export class BuildController {
         return result;
     }
 
-    start(name, position = null) {
+    prepareBuild(name, position = null, orderedBy = null) {
+        let resolved;
+        try {
+            resolved = this.resolveBlueprintName(name);
+            if (!resolved) {
+                const available = this.listBlueprints().map(bp => `${bp.name} (${bp.description})`).join(', ');
+                return { error: `Blueprint '${name}' not found! Available: ${available}` };
+            }
+        } catch (e) {
+            return { error: e.message };
+        }
+        const bpData = this.blueprint;
+        this.loadBlueprint(resolved);
+        const bp = this.blueprint;
+        this.blueprint = bpData;
+
+        let siteName = resolved;
+        let desc = '';
+        try {
+            const tmpBp = JSON.parse(readFileSync(`./blueprints/${resolved}.json`, 'utf8'));
+            desc = tmpBp.description || '';
+        } catch {}
+
+        let previewName = '';
+        if (position) {
+            previewName = generateBuildName(resolved, this.bot, position);
+        } else {
+            const pos = this.bot.entity.position;
+            previewName = generateBuildName(resolved, this.bot, { x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z) });
+        }
+
+        this.pendingBuild = { name: resolved, position, orderedBy, buildName: previewName, description: desc };
+        const sizeInfo = `${bp.blocks[0][0].length}x${bp.blocks[0].length}x${bp.blocks.length}`;
+        return {
+            confirm: true,
+            message: `Found blueprint '${resolved}' — ${desc} (size: ${sizeInfo}). Will be named "${previewName}". Build it? Reply !confirmBuild to start or !cancelBuild to cancel.`,
+        };
+    }
+
+    confirmBuild() {
+        if (!this.pendingBuild) return { error: 'No pending build to confirm.' };
+        const { name, position, orderedBy, buildName } = this.pendingBuild;
+        this.pendingBuild = null;
+        const result = this.start(name, position, orderedBy);
+        if (result === false) {
+            return { error: `Cannot build '${name}' here — overlaps with an existing structure. Use !buildQueue to see existing builds, or !demolish to remove one.` };
+        }
+        return { success: true, message: `Confirmed! Started building '${name}' (${buildName}) at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}).` };
+    }
+
+    cancelBuild() {
+        if (!this.pendingBuild) return { error: 'No pending build to cancel.' };
+        const name = this.pendingBuild.name;
+        this.pendingBuild = null;
+        return { success: true, message: `Build '${name}' cancelled.` };
+    }
+
+    start(name, position = null, orderedBy = null) {
         this.loadBlueprint(name);
+        this.orderedBy = orderedBy;
         if (position) {
             this.buildSite = position;
         } else {
@@ -152,6 +240,7 @@ export class BuildController {
             }
             this.buildSite = { x, y, z };
         }
+        this.buildName = generateBuildName(name, this.bot, this.buildSite);
         this.queue.load();
         const overlap = this.checkOverlap(this.buildSite);
         if (overlap) {
@@ -163,11 +252,11 @@ export class BuildController {
         this.active = true;
         this.failCount = 0;
         this.verifiedBlocks = new Set();
-        this.queue.addTask(name, this.buildSite);
+        this.queue.addTask(name, this.buildSite, this.orderedBy, this.buildName);
         this.saveState();
         this.agent.memory_bank.rememberPlace('build_site',
             this.buildSite.x, this.buildSite.y, this.buildSite.z);
-        this.log(`START build '${name}' at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
+        this.log(`START build '${name}' (${this.buildName}) at (${this.buildSite.x}, ${this.buildSite.y}, ${this.buildSite.z}) world=${this.getWorldId()}`);
         return true;
     }
 
@@ -262,7 +351,7 @@ export class BuildController {
         return null;
     }
 
-    switchTo(blueprintName, position = null) {
+    switchTo(blueprintName, position = null, orderedBy = null) {
         if (this.active && this.blueprint && this.buildSite) {
             this.log(`SWITCH: pausing '${this.blueprint.name}' to start '${blueprintName}'`);
             this.queue.load();
@@ -284,7 +373,7 @@ export class BuildController {
             this.active = false;
             this.saveState();
         }
-        const result = this.start(blueprintName, position);
+        const result = this.start(blueprintName, position, orderedBy);
         return result;
     }
 
@@ -551,6 +640,69 @@ export class BuildController {
         return world.getInventoryCounts(this.bot);
     }
 
+    isInventoryFull() {
+        const inventory = this.bot.inventory;
+        if (!inventory) return false;
+        const slots = inventory.slots.filter(s => s !== null);
+        return slots.length >= 35;
+    }
+
+    formatInventoryFullAction(inv, progress, posStr, siteStr) {
+        const buildMats = this.countNeededMaterials();
+        const buildMatNames = new Set(Object.keys(buildMats));
+        buildMatNames.add('oak_log'); buildMatNames.add('oak_planks'); buildMatNames.add('stick');
+        buildMatNames.add('cobblestone'); buildMatNames.add('stone'); buildMatNames.add('coal');
+        buildMatNames.add('stone_bricks'); buildMatNames.add('glass'); buildMatNames.add('oak_door');
+        buildMatNames.add('torch'); buildMatNames.add('furnace'); buildMatNames.add('crafting_table');
+        buildMatNames.add('chest'); buildMatNames.add('iron_ingot'); buildMatNames.add('raw_iron');
+        buildMatNames.add('sand'); buildMatNames.add('wooden_pickaxe'); buildMatNames.add('stone_pickaxe');
+        buildMatNames.add('iron_pickaxe'); buildMatNames.add('wooden_axe'); buildMatNames.add('stone_axe');
+        buildMatNames.add('iron_axe');
+
+        const junk = Object.entries(inv).filter(([k, v]) => !buildMatNames.has(k) && v > 0);
+        const chest = this.findUtility('chest');
+        let chestStr = '';
+        let steps = [];
+
+        if (chest) {
+            chestStr = `Chest found at (${chest.x}, ${chest.y}, ${chest.z}).`;
+            const stashItems = Object.entries(inv).filter(([k, v]) => v > 0 && !buildMatNames.has(k)).slice(0, 5);
+            for (const [item, count] of stashItems) {
+                steps.push(`!putInChest("${item}", ${Math.min(count, 64)})  [store ${item} in chest]`);
+            }
+            if (steps.length === 0) {
+                for (const [item, count] of Object.entries(inv).filter(([k,v]) => v > 0).slice(0, 5)) {
+                    steps.push(`!putInChest("${item}", ${Math.min(count, 32)})  [free space — store ${item}]`);
+                }
+            }
+        } else {
+            chestStr = 'No chest nearby.';
+            if (junk.length > 0) {
+                for (const [item, count] of junk.slice(0, 5)) {
+                    steps.push(`!discard("${item}", ${Math.min(count, 64)})  [${item} not needed for building]`);
+                }
+            } else {
+                steps.push(`!discard("dirt", 64)  [free inventory space]`);
+            }
+        }
+
+        if (steps.length === 0) steps.push('!discard("dirt", 64)  [free inventory space]');
+
+        const invStr = Object.entries(inv).filter(([k,v]) => v > 0).map(([k,v]) => `${v}x ${k}`).join(', ');
+
+        return {
+            type: 'gather',
+            done: false,
+            message: `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
+                `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
+                `INVENTORY IS FULL! You cannot collect more materials until you free space.\n` +
+                `${chestStr}\n` +
+                `Inventory: ${invStr}\n` +
+                `NEXT ACTION: ${steps[0]}\n` +
+                `After freeing space, continue gathering materials. Respond:`,
+        };
+    }
+
     getToolAction(inv, posStr, siteStr, progress) {
         const axes = ['diamond_axe', 'iron_axe', 'stone_axe', 'golden_axe', 'wooden_axe'];
         const pickaxes = ['diamond_pickaxe', 'iron_pickaxe', 'stone_pickaxe', 'golden_pickaxe', 'wooden_pickaxe'];
@@ -739,6 +891,10 @@ export class BuildController {
             const m = missing[0];
             const resolvedName = this.resolveBlockName(m.blueprintBlock);
             const haveCount = inv[resolvedName] || 0;
+
+            if (!isCreative && this.isInventoryFull()) {
+                return this.formatInventoryFullAction(inv, progress, posStr, siteStr);
+            }
 
             if (isCreative || haveCount > 0) {
                 const batch = missing.filter(mb => {
@@ -1194,7 +1350,9 @@ export class BuildController {
             `You need ${totalNeeded}x ${resolvedName}${haveStr}. ${collectStr}\n` +
             `${nextStep}\n` +
             `${toolHint}` +
-            `IMPORTANT: Do the NEXT ACTION above. Do NOT use !placeHere, !newAction, or !discard. ` +
+            `IMPORTANT: Do the NEXT ACTION above. Do NOT use !placeHere or !newAction. ` +
+            `If inventory is full, use !putInChest to store items in a chest or !discard for junk (dirt, flowers, saplings). ` +
+            `Do NOT discard building materials. ` +
             `Do NOT try to craft items that have no recipe (glass, sand). ` +
             `The build controller will place blocks automatically. Respond:`;
     }
@@ -1308,9 +1466,11 @@ export class BuildController {
             const data = {
                 worldId: this.getWorldId(),
                 blueprintName: this.blueprint?.name || null,
+                buildName: this.buildName,
                 buildSite: this.buildSite,
                 phase: this.phase,
                 active: this.active,
+                orderedBy: this.orderedBy,
                 verifiedBlocks: [...this.verifiedBlocks],
                 utilityPositions: this.utilityPositions,
                 utilities: this.utilities,
@@ -1335,6 +1495,8 @@ export class BuildController {
             this.buildSite = data.buildSite;
             this.phase = data.phase || 'clearing';
             this.active = data.active || false;
+            this.orderedBy = data.orderedBy || null;
+            this.buildName = data.buildName || null;
             this.verifiedBlocks = new Set(data.verifiedBlocks || []);
             this.utilityPositions = data.utilityPositions || {};
             this.utilities = data.utilities || [];
