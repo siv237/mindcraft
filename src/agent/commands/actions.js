@@ -1,6 +1,7 @@
 import * as skills from '../library/skills.js';
 import settings from '../settings.js';
 import convoManager from '../conversation.js';
+import { BuildController } from '../build_controller.js';
 
 
 function runAsAction (actionFn, resume = false, timeout = -1) {
@@ -358,6 +359,51 @@ export const actionsList = [
             return `Mode ${mode_name} is already ${on ? 'on' : 'off'}.`;
             modes.setOn(mode_name, on);
             return `Mode ${mode_name} is now ${on ? 'on' : 'off'}.`;
+        }
+    },
+    {
+        name: '!startBuild',
+        description: 'Start building a structure from a blueprint. The bot will continuously scan, gather materials, and place blocks until the structure is complete.',
+        params: {
+            'blueprint_name': { type: 'string', description: 'Name of the blueprint file (e.g. house_5x5).' },
+        },
+        perform: async function (agent, blueprint_name) {
+            if (!agent.build_controller) {
+                agent.build_controller = new BuildController(agent);
+            }
+            agent.build_controller.start(blueprint_name);
+            const progress = agent.build_controller.computeProgress();
+            const site = agent.build_controller.buildSite;
+            let msg = `Started building '${blueprint_name}' at (${site.x}, ${site.y}, ${site.z}). `;
+            msg += `Progress: ${progress.percent}%. The build controller will guide you step by step.`;
+            if (!agent.self_prompter.isActive()) {
+                agent.self_prompter.startBuildLoop(agent.build_controller);
+            }
+            return msg;
+        }
+    },
+    {
+        name: '!checkBuild',
+        description: 'Check the current build progress and see what needs to be done next.',
+        perform: function (agent) {
+            if (!agent.build_controller || !agent.build_controller.active) {
+                return 'No active build. Use !startBuild to begin.';
+            }
+            const progress = agent.build_controller.computeProgress();
+            const phase = agent.build_controller.determinePhase();
+            const missing = agent.build_controller.findMissingBlocks(10);
+            const wrong = agent.build_controller.findWrongBlocks();
+            const inv = agent.build_controller.getInventoryCounts();
+            let msg = `Build progress: ${progress.percent}% (${progress.placed}/${progress.total}). `;
+            msg += `Phase: ${phase}. Wrong blocks: ${wrong.length}. `;
+            if (missing.length > 0) {
+                msg += `Next blocks needed: `;
+                msg += missing.slice(0, 5).map(m => {
+                    const wp = m.worldPos;
+                    return `${m.blueprintBlock} at (${wp.x},${wp.y},${wp.z})`;
+                }).join(', ');
+            }
+            return msg;
         }
     },
     {

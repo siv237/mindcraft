@@ -1,0 +1,42 @@
+{
+    "name": "house_5x5",
+    "description": "Simple 5x5 oak house with walls, door, and roof. Origin = floor center.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "door", "planks", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "door", "planks", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "air", "planks", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["air", "air", "air", "air", "air"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "planks", "air", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"]
+        ]
+    ]
+}

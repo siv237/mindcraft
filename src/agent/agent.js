@@ -9,6 +9,7 @@ import { ActionManager } from './action_manager.js';
 import { NPCContoller } from './npc/controller.js';
 import { MemoryBank } from './memory_bank.js';
 import { SelfPrompter } from './self_prompter.js';
+import { BuildController } from './build_controller.js';
 import convoManager from './conversation.js';
 import { handleTranslation, handleEnglishTranslation } from '../utils/translator.js';
 import { addBrowserViewer } from './vision/browser_viewer.js';
@@ -44,6 +45,7 @@ export class Agent {
         this.npc = new NPCContoller(this);
         this.memory_bank = new MemoryBank();
         this.self_prompter = new SelfPrompter(this);
+        this.build_controller = new BuildController(this);
         convoManager.initAgent(this);
         await this.prompter.initExamples();
 
@@ -198,7 +200,12 @@ export class Agent {
             if (init_message) {
                 this.history.add('system', init_message);
             }
-            await this.self_prompter.handleLoad(save_data.self_prompt, save_data.self_prompting_state);
+            const buildActive = this.build_controller.loadState();
+            await this.self_prompter.handleLoad(
+                save_data.self_prompt,
+                save_data.self_prompting_state,
+                buildActive ? this.build_controller : null
+            );
         }
         if (save_data?.last_sender) {
             this.last_sender = save_data.last_sender;
@@ -218,9 +225,16 @@ export class Agent {
         }
 
         if (!save_data?.self_prompt && settings.auto_goal) {
-            console.log(`Auto-starting self-prompting with goal: ${settings.auto_goal}`);
+            console.log(`Auto-starting with goal: ${settings.auto_goal}`);
             await new Promise((resolve) => setTimeout(resolve, 3000));
-            this.self_prompter.start(settings.auto_goal);
+            if (settings.auto_goal.startsWith('!startBuild')) {
+                const match = settings.auto_goal.match(/!startBuild\("?(\w+)"?\)/);
+                const blueprintName = match ? match[1] : 'house_5x5';
+                this.build_controller.start(blueprintName);
+                this.self_prompter.startBuildLoop(this.build_controller);
+            } else {
+                this.self_prompter.start(settings.auto_goal);
+            }
         }
     }
 

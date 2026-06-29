@@ -10,6 +10,7 @@ export class SelfPrompter {
         this.prompt = '';
         this.idle_time = 0;
         this.cooldown = 2000;
+        this.build_controller = null;
     }
 
     start(prompt) {
@@ -21,6 +22,15 @@ export class SelfPrompter {
         }
         this.state = ACTIVE;
         this.prompt = prompt;
+        this.build_controller = null;
+        this.startLoop();
+    }
+
+    startBuildLoop(build_controller) {
+        console.log('Build-loop self-prompting started.');
+        this.build_controller = build_controller;
+        this.prompt = `Building ${build_controller.blueprint.name} at (${build_controller.buildSite.x}, ${build_controller.buildSite.y}, ${build_controller.buildSite.z})`;
+        this.state = ACTIVE;
         this.startLoop();
     }
 
@@ -36,15 +46,22 @@ export class SelfPrompter {
         return this.state === PAUSED;
     }
 
-    async handleLoad(prompt, state) {
+    async handleLoad(prompt, state, build_controller=null) {
         if (state == undefined)
             state = STOPPED;
         this.state = state;
         this.prompt = prompt;
-        if (state !== STOPPED && !prompt)
+        if (build_controller && build_controller.active) {
+            this.build_controller = build_controller;
+        }
+        if (state !== STOPPED && !prompt && !build_controller)
             throw new Error('No prompt loaded when self-prompting is active');
         if (state === ACTIVE) {
-            await this.start(prompt);
+            if (build_controller && build_controller.active) {
+                this.startBuildLoop(build_controller);
+            } else {
+                await this.start(prompt);
+            }
         }
     }
 
@@ -65,7 +82,25 @@ export class SelfPrompter {
         while (!this.interrupt) {
             const pos = this.agent.bot.entity.position;
             const posStr = `x:${Math.floor(pos.x)}, y:${Math.floor(pos.y)}, z:${Math.floor(pos.z)}`;
-            const msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Check your inventory with !inventory if needed. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
+            
+            let msg;
+            if (this.build_controller && this.build_controller.active) {
+                const action = this.build_controller.getNextAction();
+                if (!action) {
+                    console.log('Build controller returned no action, using fallback prompt.');
+                    msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
+                } else if (action.done) {
+                    console.log('Build complete:', action.message);
+                    this.agent.openChat(action.message);
+                    this.build_controller.stop();
+                    this.state = STOPPED;
+                    break;
+                } else {
+                    msg = action.message;
+                }
+            } else {
+                msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Check your inventory with !inventory if needed. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
+            }
             
             let used_command = await this.agent.handleMessage('system', msg, -1);
             if (!used_command) {
