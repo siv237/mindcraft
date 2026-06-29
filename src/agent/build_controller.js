@@ -23,13 +23,16 @@ export class BuildController {
     }
 
     getWorldId() {
-        if (this.worldId) return this.worldId;
         const spawn = this.bot.spawnPoint;
         const dim = this.bot.game?.dimension || 'minecraft:overworld';
-        const sx = spawn ? spawn.x : 0;
-        const sy = spawn ? spawn.y : 0;
-        const sz = spawn ? spawn.z : 0;
-        this.worldId = `${dim}_${sx}_${sy}_${sz}`;
+        if (spawn && (spawn.x !== 0 || spawn.y !== 0 || spawn.z !== 0)) {
+            this.worldId = `${dim}_${Math.floor(spawn.x)}_${Math.floor(spawn.y)}_${Math.floor(spawn.z)}`;
+        } else if (this.bot.entity?.position) {
+            const pos = this.bot.entity.position;
+            this.worldId = `${dim}_${Math.floor(pos.x / 1000) * 1000}_${Math.floor(pos.y / 100) * 100}_${Math.floor(pos.z / 1000) * 1000}`;
+        } else {
+            this.worldId = `${dim}_unknown`;
+        }
         return this.worldId;
     }
 

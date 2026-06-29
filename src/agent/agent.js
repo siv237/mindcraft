@@ -223,6 +223,7 @@ export class Agent {
             if (init_message) {
                 this.history.add('system', init_message);
             }
+            this.build_controller.worldId = null;
             let buildActive = this.build_controller.loadState();
             if (buildActive) {
                 const site = this.build_controller.buildSite;
@@ -273,13 +274,14 @@ export class Agent {
         }
 
         if (!save_data?.self_prompt && settings.auto_goal) {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            this.build_controller.worldId = null;
             const existing = this.build_controller.loadState();
             if (existing && this.build_controller.active) {
-                console.log(`Build already active for world ${this.build_controller.worldId} at (${this.build_controller.buildSite.x},${this.build_controller.buildSite.y},${this.build_controller.buildSite.z}). Resuming.`);
+                console.log(`Build already active for world ${this.build_controller.getWorldId()} at (${this.build_controller.buildSite.x},${this.build_controller.buildSite.y},${this.build_controller.buildSite.z}). Resuming.`);
                 this.self_prompter.startBuildLoop(this.build_controller);
             } else {
                 console.log(`Auto-starting with goal: ${settings.auto_goal}`);
-                await new Promise((resolve) => setTimeout(resolve, 3000));
                 if (settings.auto_goal.startsWith('!startBuild')) {
                     const match = settings.auto_goal.match(/!startBuild\("?(\w+)"?\)/);
                     const blueprintName = match ? match[1] : 'house_5x5';

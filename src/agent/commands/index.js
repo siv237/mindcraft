@@ -15,7 +15,7 @@ export function getCommand(name) {
 }
 
 export function blacklistCommands(commands) {
-    const unblockable = ['!stop', '!stats', '!inventory', '!goal'];
+    const unblockable = ['!stats', '!inventory', '!goal'];
     for (let command_name of commands) {
         if (unblockable.includes(command_name)){
             console.warn(`Command ${command_name} is unblockable`);
@@ -224,6 +224,9 @@ export async function executeCommand(agent, message) {
         else {
             if (parsed.commandName === '!placeHere' && agent.build_controller?.active) {
                 return 'Do not use !placeHere during building. The build controller places blocks automatically. Use !discard to drop unwanted items.';
+            }
+            if ((parsed.commandName === '!stop' || parsed.commandName === '!endGoal' || parsed.commandName === '!stfu') && agent.build_controller?.active) {
+                return `Cannot stop during building. The build controller is active. Use !newBuild to start a new build or ask the player to stop you.`;
             }
             const result = await command.perform(agent, ...parsed.args);
             return result;
