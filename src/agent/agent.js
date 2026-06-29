@@ -273,7 +273,8 @@ export class Agent {
         }
 
         if (!save_data?.self_prompt && settings.auto_goal) {
-            if (this.build_controller && this.build_controller.active) {
+            const existing = this.build_controller.loadState();
+            if (existing && this.build_controller.active) {
                 console.log(`Build already active for world ${this.build_controller.worldId} at (${this.build_controller.buildSite.x},${this.build_controller.buildSite.y},${this.build_controller.buildSite.z}). Resuming.`);
                 this.self_prompter.startBuildLoop(this.build_controller);
             } else {
