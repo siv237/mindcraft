@@ -422,8 +422,9 @@ export class BuildController {
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
-            `You need ${resolvedName}. ${gatherHint} ` +
-            `Do NOT stockpile — gather just enough and return to build. Respond:`;
+            `You need ${resolvedName}. ${gatherHint}\n` +
+            `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. The build controller will place blocks automatically. ` +
+            `Only gather and craft materials. Respond:`;
     }
 
     saveState() {

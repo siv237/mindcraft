@@ -22,7 +22,6 @@ export function blacklistCommands(commands) {
             continue;
         }
         delete commandMap[command_name];
-        delete commandList.find(command => command.name === command_name);
     }
 }
 
@@ -223,6 +222,9 @@ export async function executeCommand(agent, message) {
         if (numArgs !== numParams(command))
             return `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.`;
         else {
+            if (parsed.commandName === '!placeHere' && agent.build_controller?.active) {
+                return 'Do not use !placeHere during building. The build controller places blocks automatically. Use !discard to drop unwanted items.';
+            }
             const result = await command.perform(agent, ...parsed.args);
             return result;
         }
