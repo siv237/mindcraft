@@ -1,0 +1,52 @@
+{
+    "name": "wall_7x7",
+    "description": "Defensive 7x7 cobblestone wall, 5 high with battlements on top.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "cobblestone", "door", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "cobblestone", "door", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "air", "air", "air", "air", "air", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone", "air", "cobblestone", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air", "air", "air"],
+            ["cobblestone", "air", "cobblestone", "air", "cobblestone", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air", "air", "air"],
+            ["cobblestone", "air", "cobblestone", "air", "cobblestone", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air", "air", "air"],
+            ["cobblestone", "air", "cobblestone", "air", "cobblestone", "air", "cobblestone"]
+        ]
+    ]
+}

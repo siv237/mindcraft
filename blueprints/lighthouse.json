@@ -1,0 +1,105 @@
+{
+    "name": "lighthouse",
+    "description": "Tall 5x5 lighthouse, 15 high, with glass observation room and torch beacon.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "door", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "air", "air", "cobblestone"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["air", "air", "air", "air", "air"],
+            ["cobblestone", "cobblestone", "air", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "glass", "glass", "glass", "cobblestone"],
+            ["glass", "air", "air", "air", "glass"],
+            ["glass", "air", "torch", "air", "glass"],
+            ["glass", "air", "air", "air", "glass"],
+            ["cobblestone", "glass", "glass", "glass", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "torch", "torch", "torch", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ]
+    ]
+}

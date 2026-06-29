@@ -1,0 +1,31 @@
+{
+    "name": "storage_shed",
+    "description": "Compact 4x4 storage shed with cobblestone floor and oak walls.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks"],
+            ["planks", "chest", "chest", "planks"],
+            ["planks", "air", "air", "planks"],
+            ["planks", "door", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "glass", "planks"],
+            ["planks", "air", "air", "planks"],
+            ["planks", "torch", "air", "planks"],
+            ["planks", "door", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks"]
+        ]
+    ]
+}

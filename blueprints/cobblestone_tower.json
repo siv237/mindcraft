@@ -1,0 +1,47 @@
+{
+    "name": "cobblestone_tower",
+    "description": "Simple 3x3 cobblestone tower, 8 high. Good lookout post.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "air", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "air", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "air", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "air", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "air", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "air", "cobblestone"],
+            ["air", "air", "air"],
+            ["cobblestone", "door", "cobblestone"]
+        ],
+        [
+            ["cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone"]
+        ]
+    ]
+}

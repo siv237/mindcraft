@@ -1,0 +1,52 @@
+{
+    "name": "stone_brick_house",
+    "description": "7x7 stone brick house with glass windows and oak door.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"]
+        ],
+        [
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "door", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"]
+        ],
+        [
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "glass", "air", "air", "air", "glass", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "torch", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "glass", "air", "air", "air", "glass", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "door", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"]
+        ],
+        [
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "glass", "air", "air", "air", "glass", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "air", "air", "air", "air", "air", "stone_bricks"],
+            ["stone_bricks", "glass", "air", "air", "air", "glass", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"]
+        ],
+        [
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"],
+            ["stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks", "stone_bricks"]
+        ]
+    ]
+}

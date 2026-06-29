@@ -1,0 +1,25 @@
+{
+    "name": "bridge",
+    "description": "Simple 3-wide oak bridge, 7 long, with railings.",
+    "offset": 0,
+    "blocks": [
+        [
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"],
+            ["planks", "planks", "planks"]
+        ],
+        [
+            ["air", "air", "air"],
+            ["oak_fence", "air", "oak_fence"],
+            ["oak_fence", "air", "oak_fence"],
+            ["oak_fence", "air", "oak_fence"],
+            ["oak_fence", "air", "oak_fence"],
+            ["oak_fence", "air", "oak_fence"],
+            ["air", "air", "air"]
+        ]
+    ]
+}

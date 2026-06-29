@@ -1,0 +1,35 @@
+{
+    "name": "farm_hut",
+    "description": "Small 5x5 farm hut with cobblestone floor, oak walls, and a door.",
+    "offset": -1,
+    "blocks": [
+        [
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"],
+            ["cobblestone", "cobblestone", "cobblestone", "cobblestone", "cobblestone"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "door", "planks", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "glass", "planks", "planks"],
+            ["planks", "air", "air", "air", "planks"],
+            ["glass", "air", "torch", "air", "glass"],
+            ["planks", "air", "air", "air", "planks"],
+            ["planks", "door", "planks", "planks", "planks"]
+        ],
+        [
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"],
+            ["planks", "planks", "planks", "planks", "planks"]
+        ]
+    ]
+}
