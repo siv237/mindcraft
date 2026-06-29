@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import minecraftData from 'minecraft-data';
 import settings from '../settings.js';
-import { initMcData } from '../src/utils/mcdata.js';
+import { initMcData, getItemCraftingRecipes, isSmeltable } from '../src/utils/mcdata.js';
+import * as mc from '../src/utils/mcdata.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEST_DIR = join(__dirname, 'tmp_test');
@@ -979,5 +980,169 @@ describe('getMaterialPlan - craft chain resolution', () => {
         bc.getInventoryCounts = () => ({ oak_planks: 20 });
         const text = bc.formatMaterialPlan('oak_planks', 10);
         assert.match(text, /already have/);
+    });
+});
+
+describe('Blueprint buildability - all blueprints must be craftable step-by-step', () => {
+    let bc;
+
+    before(() => {
+        const agent = makeMockAgent();
+        bc = new BuildController(agent);
+    });
+
+    function getAllBlueprintBlocks(bp) {
+        const blocks = new Set();
+        for (const y of bp.blocks) {
+            for (const z of y) {
+                for (const x of z) {
+                    if (x && x !== 'air' && x !== '') blocks.add(x);
+                }
+            }
+        }
+        return blocks;
+    }
+
+    function resolveGeneric(name) {
+        const genericMap = {
+            'planks': 'oak_planks', 'log': 'oak_log', 'door': 'oak_door',
+            'bed': 'red_bed', 'torch': 'torch', 'fence': 'oak_fence',
+            'leaves': 'oak_leaves', 'stairs': 'oak_stairs', 'slab': 'oak_slab',
+        };
+        return genericMap[name] || name;
+    }
+
+    const GATHERABLE = new Set([
+        'dirt', 'grass_block', 'sand', 'gravel', 'coarse_dirt', 'podzol', 'mycelium',
+        'cobblestone', 'coal', 'diamond', 'emerald', 'iron_ingot', 'gold_ingot',
+        'redstone', 'quartz', 'clay_ball', 'raw_iron', 'raw_gold', 'raw_copper',
+        'lapis_lazuli', 'wheat', 'bone_meal', 'slime_ball', 'snow_block', 'ice',
+        'packed_ice', 'blue_ice', 'oak_sapling', 'spruce_sapling', 'birch_sapling',
+        'carrots', 'potatoes', 'beetroots', 'melon_stem', 'pumpkin_stem',
+    ]);
+
+    it('all blueprints should load without error', () => {
+        const bps = bc.listBlueprints();
+        assert.ok(bps.length >= 13, `expected at least 13 blueprints, got ${bps.length}`);
+        for (const bp of bps) {
+            const loaded = bc.loadBlueprint(bp.name);
+            assert.ok(loaded, `Failed to load blueprint ${bp.name}`);
+            assert.ok(bc.blueprint, `Blueprint ${bp.name} not set after load`);
+        }
+    });
+
+    it('all blueprints should have valid 3D blocks array', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const blocks = bc.blueprint.blocks;
+            assert.ok(Array.isArray(blocks), `${bp.name}: blocks should be array`);
+            assert.ok(blocks.length > 0, `${bp.name}: blocks should have at least 1 layer`);
+            for (let y = 0; y < blocks.length; y++) {
+                assert.ok(Array.isArray(blocks[y]), `${bp.name}: layer ${y} should be array`);
+                for (let z = 0; z < blocks[y].length; z++) {
+                    assert.ok(Array.isArray(blocks[y][z]), `${bp.name}: layer ${y} z=${z} should be array`);
+                    for (let x = 0; x < blocks[y][z].length; x++) {
+                        const b = blocks[y][z][x];
+                        assert.ok(typeof b === 'string', `${bp.name}: block at ${x},${y},${z} should be string, got ${typeof b}`);
+                    }
+                }
+            }
+        }
+    });
+
+    it('every block type in every blueprint should have a getMaterialPlan path', () => {
+        const bps = bc.listBlueprints();
+        const problems = [];
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const blockTypes = getAllBlueprintBlocks(bc.blueprint);
+            for (const blockName of blockTypes) {
+                const resolved = resolveGeneric(blockName);
+                const plan = bc.getMaterialPlan(resolved, 1, {});
+                const hasSteps = plan.steps.length > 0 || plan.have > 0;
+                const hasCollect = Object.keys(plan.collect).length > 0;
+                if (!hasSteps && !hasCollect && !GATHERABLE.has(resolved)) {
+                    problems.push(`${bp.name}: block "${blockName}" (resolved: ${resolved}) has no material plan path`);
+                }
+            }
+        }
+        if (problems.length > 0) {
+            console.error('Blueprint buildability problems:\n  ' + problems.join('\n  '));
+        }
+        assert.strictEqual(problems.length, 0, `${problems.length} blocks have no material plan. See stderr for details.`);
+    });
+
+    it('every blueprint should have a resolvable material plan for ALL its blocks combined', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const blockTypes = getAllBlueprintBlocks(bc.blueprint);
+            const allProblems = [];
+            for (const blockName of blockTypes) {
+                const resolved = resolveGeneric(blockName);
+                const plan = bc.getMaterialPlan(resolved, 64, {});
+                if (plan.steps.length === 0 && plan.have === 0 && !GATHERABLE.has(resolved)) {
+                    allProblems.push(blockName);
+                }
+            }
+            assert.strictEqual(allProblems.length, 0,
+                `${bp.name}: ${allProblems.length} blocks have no plan: ${allProblems.join(', ')}`);
+        }
+    });
+
+    it('getMaterialPlan should never infinite-loop (depth limit)', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const blockTypes = getAllBlueprintBlocks(bc.blueprint);
+            for (const blockName of blockTypes) {
+                const resolved = resolveGeneric(blockName);
+                const start = Date.now();
+                const plan = bc.getMaterialPlan(resolved, 100, {});
+                const elapsed = Date.now() - start;
+                assert.ok(elapsed < 5000, `${bp.name}: getMaterialPlan(${resolved}) took ${elapsed}ms — possible infinite loop`);
+            }
+        }
+    });
+
+    it('all collect items should be gatherable (not craftable-only)', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const blockTypes = getAllBlueprintBlocks(bc.blueprint);
+            for (const blockName of blockTypes) {
+                const resolved = resolveGeneric(blockName);
+                const plan = bc.getMaterialPlan(resolved, 10, {});
+                for (const [item, count] of Object.entries(plan.collect)) {
+                    const itemRecipes = mc.getItemCraftingRecipes(item);
+                    const itemSmelt = mc.isSmeltable(item);
+                    const isGatherable = GATHERABLE.has(item) ||
+                        (!itemRecipes || itemRecipes.length === 0) && !itemSmelt;
+                    assert.ok(isGatherable || itemRecipes || itemSmelt,
+                        `${bp.name}: collect item "${item}" for "${blockName}" is neither gatherable, craftable, nor smeltable`);
+                }
+            }
+        }
+    });
+
+    it('blueprint dimensions should be reasonable (< 30 in each axis)', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            const { sx, sy, sz } = bc.getDimensions();
+            assert.ok(sx <= 30, `${bp.name}: x dimension ${sx} too large (max 30)`);
+            assert.ok(sy <= 30, `${bp.name}: y dimension ${sy} too large (max 30)`);
+            assert.ok(sz <= 30, `${bp.name}: z dimension ${sz} too large (max 30)`);
+        }
+    });
+
+    it('every blueprint should have offset field', () => {
+        const bps = bc.listBlueprints();
+        for (const bp of bps) {
+            bc.loadBlueprint(bp.name);
+            assert.ok(bc.blueprint.offset !== undefined, `${bp.name}: missing offset field`);
+            assert.ok(typeof bc.blueprint.offset === 'number', `${bp.name}: offset should be number`);
+        }
     });
 });
