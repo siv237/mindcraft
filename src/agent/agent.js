@@ -227,12 +227,16 @@ export class Agent {
             if (buildActive) {
                 const site = this.build_controller.buildSite;
                 const blockAt = this.bot.blockAt(new Vec3(site.x, site.y, site.z));
-                if (!blockAt || blockAt.name === 'air' || blockAt.name === 'void_air' || site.y < -64) {
-                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void/air — likely a new world. Clearing old build state.`);
+                const progress = this.build_controller.computeProgress();
+                if (!blockAt || blockAt.name === 'air' || blockAt.name === 'void_air' || site.y < -64 || progress.percent === 0) {
+                    console.log(`Build site (${site.x},${site.y},${site.z}) is stale (progress=${progress.percent}%). New world detected — clearing old build state and memory.`);
                     this.build_controller.stop();
                     const { unlinkSync } = await import('fs');
                     try { unlinkSync(this.build_controller.stateFile); } catch {}
                     buildActive = false;
+                    this.history.clear();
+                    this.history.memory = '';
+                    this.memory_bank = new MemoryBank();
                 }
             }
             await this.self_prompter.handleLoad(
