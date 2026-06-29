@@ -71,27 +71,21 @@ export class Agent {
         // Re-discover MC server via multicast on every startup
         // This handles server restarts with new port/world
         let discovered = false;
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        let attempt = 0;
+        while (!discovered) {
+            attempt++;
             try {
-                console.log(`Server discovery attempt ${attempt}/5...`);
+                console.log(`Server discovery attempt ${attempt}...`);
                 const server = await getServer('auto', -1, settings.minecraft_version);
                 settings.host = server.host;
                 settings.port = server.port;
                 settings.minecraft_version = server.version;
                 discovered = true;
-                break;
             } catch (e) {
                 console.warn(`Server discovery failed: ${e.message}`);
-                if (attempt < 5) {
-                    console.log(`Retrying in 10 seconds...`);
-                    await new Promise(r => setTimeout(r, 10000));
-                }
+                console.log(`Retrying in 15 seconds...`);
+                await new Promise(r => setTimeout(r, 15000));
             }
-        }
-        if (!discovered) {
-            console.error('Could not find Minecraft server after 5 attempts. Exiting.');
-            process.exit(1);
-            return;
         }
 
         this.bot = initBot(this.name);

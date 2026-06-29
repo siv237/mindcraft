@@ -301,7 +301,8 @@ export class BuildController {
             const resolvedName = this.resolveBlockName(m.blueprintBlock);
             const inv = this.getInventoryCounts();
             const haveCount = inv[resolvedName] || 0;
-            const isCreative = this.bot.game.gameMode === 'creative';
+            const gameMode = this.bot.game?.gameMode;
+            const isCreative = gameMode === 'creative';
 
             if (isCreative || haveCount > 0) {
                 return {
