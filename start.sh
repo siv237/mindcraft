@@ -93,6 +93,19 @@ else
     ok "Port 8080 free"
 fi
 
+# ========== LOG ROTATION ==========
+LOG_FILE="$MINDCRAFT_DIR/mindcraft.log"
+OLD_LOG="$MINDCRAFT_DIR/mindcraft.old.log"
+if [[ -f "$LOG_FILE" ]]; then
+    if [[ -f "$OLD_LOG" ]]; then
+        cat "$LOG_FILE" >> "$OLD_LOG"
+    else
+        cp "$LOG_FILE" "$OLD_LOG"
+    fi
+    : > "$LOG_FILE"
+    log "Log rotated — previous log appended to mindcraft.old.log"
+fi
+
 # ========== START ==========
 
 log "All checks passed. Starting MindCraft..."
