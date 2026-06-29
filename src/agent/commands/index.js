@@ -228,7 +228,10 @@ export async function executeCommand(agent, message) {
             return `Command ${command.name} was given ${numArgs} args, but requires ${requiredCount}-${params.length} args.`;
         else {
             if (parsed.commandName === '!placeHere' && agent.build_controller?.active) {
-                return 'Do not use !placeHere during building. The build controller places blocks automatically. Use !discard to drop unwanted items.';
+                return 'Blocks are placed automatically by the build controller. You do NOT need to place anything. If you need materials, use !collectBlocks or !craftRecipe. Do NOT discard materials.';
+            }
+            if (parsed.commandName === '!discard' && agent.build_controller?.active) {
+                return 'Do NOT discard materials during building. You need them for construction. If the build controller needs blocks, it will ask you to gather or craft. Wait for the next build controller instruction.';
             }
             if ((parsed.commandName === '!stop' || parsed.commandName === '!endGoal' || parsed.commandName === '!stfu') && agent.build_controller?.active) {
                 return `Cannot stop during building. The build controller is active. Use !newBuild to start a new build or ask the player to stop you.`;
