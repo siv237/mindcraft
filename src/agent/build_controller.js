@@ -1,6 +1,7 @@
 import { Vec3 } from 'vec3';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import * as world from './library/world.js';
+import * as skills from './library/skills.js';
 import { blockSatisfied, getTypeOfGeneric } from './npc/utils.js';
 
 const PHASES = ['clearing', 'floor', 'walls', 'roof', 'details', 'done'];
@@ -272,9 +273,10 @@ export class BuildController {
             this.active = false;
             this.saveState();
             return {
+                type: 'done',
                 done: true,
                 message: `HOUSE COMPLETE! Progress: ${progress.percent}%. Build site: ${siteStr}. ` +
-                    `The house is fully built. You can relax now. Use !endGoal to stop building.`,
+                    `The house is fully built. You can relax now.`,
             };
         }
 
@@ -283,7 +285,11 @@ export class BuildController {
             if (wrong.length > 0) {
                 const w = wrong[0];
                 return {
+                    type: 'break',
                     done: false,
+                    worldPos: w.worldPos,
+                    expected: w.expected,
+                    actual: w.actual,
                     message: this.formatClearAction(w, progress, posStr, siteStr),
                 };
             }
@@ -295,15 +301,22 @@ export class BuildController {
             const resolvedName = this.resolveBlockName(m.blueprintBlock);
             const inv = this.getInventoryCounts();
             const haveCount = inv[resolvedName] || 0;
+            const isCreative = this.bot.game.gameMode === 'creative';
 
-            if (haveCount > 0) {
+            if (isCreative || haveCount > 0) {
                 return {
+                    type: 'place',
                     done: false,
+                    worldPos: m.worldPos,
+                    blockType: resolvedName,
+                    blueprintBlock: m.blueprintBlock,
                     message: this.formatPlaceAction(m, resolvedName, progress, posStr, siteStr),
                 };
             } else {
                 return {
+                    type: 'gather',
                     done: false,
+                    blockType: resolvedName,
                     message: this.formatGatherAction(m, resolvedName, progress, posStr, siteStr),
                 };
             }
@@ -313,7 +326,11 @@ export class BuildController {
         if (wrong.length > 0) {
             const w = wrong[0];
             return {
+                type: 'break',
                 done: false,
+                worldPos: w.worldPos,
+                expected: w.expected,
+                actual: w.actual,
                 message: this.formatClearAction(w, progress, posStr, siteStr),
             };
         }
@@ -321,9 +338,45 @@ export class BuildController {
         this.phase = 'done';
         this.saveState();
         return {
+            type: 'done',
             done: true,
             message: `HOUSE COMPLETE! Progress: ${progress.percent}%. Build site: ${siteStr}.`,
         };
+    }
+
+    async executeDirect(action) {
+        if (action.type === 'place') {
+            const wp = action.worldPos;
+            console.log(`BuildController: directly placing ${action.blockType} at (${wp.x}, ${wp.y}, ${wp.z})`);
+            const isCheat = this.bot.modes.isOn('cheat');
+            const actionFn = async () => {
+                if (!isCheat) {
+                    await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 4);
+                }
+                await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
+            };
+            const res = await this.agent.actions.runAction('build:place', actionFn, { timeout: 30 });
+            if (!isCheat && res.message && res.message.includes('Failed to place')) {
+                console.log('BuildController: place failed, retrying closer...');
+                const actionFn2 = async () => {
+                    await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 2);
+                    await skills.placeBlock(this.bot, action.blockType, wp.x, wp.y, wp.z);
+                };
+                return await this.agent.actions.runAction('build:place', actionFn2, { timeout: 30 });
+            }
+            return res;
+        }
+        if (action.type === 'break') {
+            const wp = action.worldPos;
+            console.log(`BuildController: directly breaking ${action.actual} at (${wp.x}, ${wp.y}, ${wp.z})`);
+            const actionFn = async () => {
+                await skills.goToPosition(this.bot, wp.x, wp.y, wp.z, 4);
+                await skills.breakBlockAt(this.bot, wp.x, wp.y, wp.z);
+            };
+            const res = await this.agent.actions.runAction('build:break', actionFn, { timeout: 30 });
+            return res;
+        }
+        return null;
     }
 
     formatClearAction(w, progress, posStr, siteStr) {
@@ -347,14 +400,31 @@ export class BuildController {
     }
 
     formatGatherAction(m, resolvedName, progress, posStr, siteStr) {
+        const inv = this.getInventoryCounts();
+        const isCreative = this.bot.game.gameMode === 'creative';
+        if (isCreative) {
+            const wp = m.worldPos;
+            return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
+                `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
+                `You are in CREATIVE mode. You have infinite blocks. ` +
+                `Place ${resolvedName} at (${wp.x}, ${wp.y}, ${wp.z}). Respond:`;
+        }
         const needed = this.countMissingMaterials();
         const neededStr = Object.entries(needed).map(([k, v]) => `${v}x ${k}`).join(', ');
+        const haveLogs = inv['oak_log'] || 0;
+        const havePlanks = inv['oak_planks'] || 0;
+        let gatherHint;
+        if (havePlanks > 0) {
+            gatherHint = `You already have ${havePlanks} oak_planks. Try crafting what you need: !craftRecipe("${resolvedName}", 1).`;
+        } else if (haveLogs > 0) {
+            gatherHint = `You already have ${haveLogs} oak_log. Craft planks first: !craftRecipe("oak_planks", 2). Then craft: !craftRecipe("${resolvedName}", 1).`;
+        } else {
+            gatherHint = `Gather materials: !collectBlocks("oak_log", 5). Then craft: !craftRecipe("oak_planks", 2).`;
+        }
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
-            `You need ${resolvedName} to continue building. ` +
-            `First gather raw materials: !collectBlocks("oak_log", 10). ` +
-            `Then craft: !craftRecipe("oak_planks", 4). ` +
+            `You need ${resolvedName}. ${gatherHint} ` +
             `Do NOT stockpile — gather just enough and return to build. Respond:`;
     }
 

@@ -84,6 +84,7 @@ export class SelfPrompter {
             const posStr = `x:${Math.floor(pos.x)}, y:${Math.floor(pos.y)}, z:${Math.floor(pos.z)}`;
             
             let msg;
+            let directAction = null;
             if (this.build_controller && this.build_controller.active) {
                 const action = this.build_controller.getNextAction();
                 if (!action) {
@@ -95,6 +96,9 @@ export class SelfPrompter {
                     this.build_controller.stop();
                     this.state = STOPPED;
                     break;
+                } else if (action.type === 'place' || action.type === 'break') {
+                    directAction = action;
+                    msg = action.message;
                 } else {
                     msg = action.message;
                 }
@@ -102,20 +106,30 @@ export class SelfPrompter {
                 msg = `You are self-prompting with the goal: '${this.prompt}'. Your current position: ${posStr}. Check your inventory with !inventory if needed. Continue from where you left off. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
             }
             
-            let used_command = await this.agent.handleMessage('system', msg, -1);
-            if (!used_command) {
-                no_command_count++;
-                if (no_command_count >= MAX_NO_COMMAND) {
-                    let out = `Agent did not use command in the last ${MAX_NO_COMMAND} auto-prompts. Stopping auto-prompting.`;
-                    this.agent.openChat(out);
-                    console.warn(out);
-                    this.state = STOPPED;
-                    break;
-                }
-            }
-            else {
+            let used_command;
+            if (directAction) {
+                console.log(`Build direct execution: ${directAction.type} at ${directAction.worldPos}`);
+                const res = await this.build_controller.executeDirect(directAction);
+                used_command = true;
                 no_command_count = 0;
+                console.log(`Build direct result:`, res);
                 await new Promise(r => setTimeout(r, this.cooldown));
+            } else {
+                used_command = await this.agent.handleMessage('system', msg, -1);
+                if (!used_command) {
+                    no_command_count++;
+                    if (no_command_count >= MAX_NO_COMMAND) {
+                        let out = `Agent did not use command in the last ${MAX_NO_COMMAND} auto-prompts. Stopping auto-prompting.`;
+                        this.agent.openChat(out);
+                        console.warn(out);
+                        this.state = STOPPED;
+                        break;
+                    }
+                }
+                else {
+                    no_command_count = 0;
+                    await new Promise(r => setTimeout(r, this.cooldown));
+                }
             }
         }
         console.log('self prompt loop stopped')
