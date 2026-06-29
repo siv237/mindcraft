@@ -730,6 +730,9 @@ export class BuildController {
                 } else {
                     placed++;
                     this.verifiedBlocks.add(wpKey);
+                    if (blk.blockType.includes('door')) {
+                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
+                    }
                 }
             }
             this.log(`BATCH: placed ${placed} blocks, ${failed} failed`);
@@ -761,6 +764,9 @@ export class BuildController {
                     this.log(`SKIP block at (${wp.x},${wp.y},${wp.z}) after ${this.failCount} failures`);
                     this.failCount = 0;
                     this.verifiedBlocks.add(wpKey);
+                    if (action.blockType.includes('door')) {
+                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
+                    }
                     return res;
                 }
                 const actionFn2 = async () => {
@@ -774,12 +780,22 @@ export class BuildController {
                 } else {
                     this.failCount = 0;
                     this.verifiedBlocks.add(wpKey);
-                    this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
+                    if (action.blockType.includes('door')) {
+                        this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
+                        this.log(`PLACE OK door (both halves) at (${wp.x},${wp.y},${wp.z})`);
+                    } else {
+                        this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
+                    }
                 }
             } else {
                 this.failCount = 0;
                 this.verifiedBlocks.add(wpKey);
-                this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
+                if (action.blockType.includes('door')) {
+                    this.verifiedBlocks.add(`${wp.x},${wp.y + 1},${wp.z}`);
+                    this.log(`PLACE OK door (both halves) at (${wp.x},${wp.y},${wp.z})`);
+                } else {
+                    this.log(`PLACE OK at (${wp.x},${wp.y},${wp.z})`);
+                }
             }
             return res;
         }
