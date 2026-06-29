@@ -233,6 +233,9 @@ export const queryList = [
             'levelNum': { type: 'int', description: 'The level number to check.', domain: [0, Number.MAX_SAFE_INTEGER] }
         },
         perform: function (agent, levelNum) {
+            if (!agent.task?.blueprint) {
+                return 'No blueprint task active. Use !checkBuild to check build controller progress.';
+            }
             let res = checkLevelBlueprint(agent, levelNum);
             console.log(res);
             return pad(res);
@@ -242,6 +245,9 @@ export const queryList = [
         name: '!checkBlueprint',
         description: 'Check what blocks still need to be placed for the blueprint',
         perform: function (agent) {
+            if (!agent.task?.blueprint) {
+                return 'No blueprint task active. Use !checkBuild to check build controller progress.';
+            }
             let res = checkBlueprint(agent);
             return pad(res);
         }
@@ -250,6 +256,9 @@ export const queryList = [
         name: '!getBlueprint',
         description: 'Get the blueprint for the building',
         perform: function (agent) {
+            if (!agent.task?.blueprint) {
+                return 'No blueprint task active.';
+            }
             let res = agent.task.blueprint.explain();
             return pad(res);
         }
@@ -261,6 +270,9 @@ export const queryList = [
             'levelNum': { type: 'int', description: 'The level number to check.', domain: [0, Number.MAX_SAFE_INTEGER] }
         },
         perform: function (agent, levelNum) {
+            if (!agent.task?.blueprint) {
+                return 'No blueprint task active.';
+            }
             let res = agent.task.blueprint.explainLevel(levelNum);
             console.log(res);
             return pad(res);

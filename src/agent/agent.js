@@ -227,9 +227,8 @@ export class Agent {
             if (buildActive) {
                 const site = this.build_controller.buildSite;
                 const blockAt = this.bot.blockAt(new Vec3(site.x, site.y, site.z));
-                const progress = this.build_controller.computeProgress();
-                if (!blockAt || blockAt.name === 'air' || blockAt.name === 'void_air' || site.y < -64 || progress.percent === 0) {
-                    console.log(`Build site (${site.x},${site.y},${site.z}) is stale (progress=${progress.percent}%). New world detected — clearing old build state and memory.`);
+                if (!blockAt || blockAt.name === 'void_air' || site.y < -64) {
+                    console.log(`Build site (${site.x},${site.y},${site.z}) is in void — new world detected. Clearing old build state and memory.`);
                     this.build_controller.stop();
                     const { unlinkSync } = await import('fs');
                     try { unlinkSync(this.build_controller.stateFile); } catch {}
@@ -237,13 +236,24 @@ export class Agent {
                     this.history.clear();
                     this.history.memory = '';
                     this.memory_bank = new MemoryBank();
+                    save_data.self_prompt = null;
+                    save_data.self_prompting_state = 0;
                 }
+            } else if (save_data.self_prompt && save_data.self_prompt.includes('Building')) {
+                console.log('self_prompt references old build but no build_state found. Clearing memory.');
+                this.history.clear();
+                this.history.memory = '';
+                this.memory_bank = new MemoryBank();
+                save_data.self_prompt = null;
+                save_data.self_prompting_state = 0;
             }
-            await this.self_prompter.handleLoad(
-                save_data.self_prompt,
-                save_data.self_prompting_state,
-                buildActive ? this.build_controller : null
-            );
+            if (save_data.self_prompt) {
+                await this.self_prompter.handleLoad(
+                    save_data.self_prompt,
+                    save_data.self_prompting_state,
+                    buildActive ? this.build_controller : null
+                );
+            }
         }
         if (save_data?.last_sender) {
             this.last_sender = save_data.last_sender;
@@ -442,7 +452,11 @@ export class Agent {
             setTimeout(() => {
                 if (this.self_prompter.isPaused() && !convoManager.inConversation()) {
                     console.log('Resuming self-prompting after player interaction...');
-                    this.self_prompter.start();
+                    if (this.build_controller && this.build_controller.active) {
+                        this.self_prompter.startBuildLoop(this.build_controller);
+                    } else {
+                        this.self_prompter.start();
+                    }
                 }
             }, 3000);
         }
