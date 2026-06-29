@@ -168,6 +168,10 @@ export class BuildController {
             this.phase = 'clearing';
         }
 
+        if (this.phase === 'tools' && isCreative) {
+            this.phase = 'clearing';
+        }
+
         if (this.phase === 'clearing') {
             const hasWrongBlocks = this.findWrongBlocks().length > 0;
             const floorComplete = this.isLevelComplete(0);
