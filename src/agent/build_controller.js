@@ -75,6 +75,38 @@ export class BuildController {
         throw new Error(`Blueprint '${name}' not found in blueprints/ or npc/construction/`);
     }
 
+    listBlueprints() {
+        const result = [];
+        const dirs = ['./blueprints', './src/agent/npc/construction'];
+        for (const dir of dirs) {
+            if (!existsSync(dir)) continue;
+            const files = readdirSync(dir).filter(f => f.endsWith('.json'));
+            for (const f of files) {
+                try {
+                    const data = JSON.parse(readFileSync(`${dir}/${f}`, 'utf8'));
+                    const name = data.name || f.replace('.json', '');
+                    const blocks = data.blocks;
+                    const sy = blocks.length;
+                    const sz = blocks[0].length;
+                    const sx = blocks[0][0].length;
+                    const desc = data.description || '';
+                    const counts = {};
+                    for (let y = 0; y < sy; y++)
+                        for (let z = 0; z < sz; z++)
+                            for (let x = 0; x < sx; x++) {
+                                const b = blocks[y][z][x];
+                                if (b && b !== '' && b !== 'air') {
+                                    counts[b] = (counts[b] || 0) + 1;
+                                }
+                            }
+                    const mats = Object.entries(counts).map(([k, v]) => `${v}x ${k}`).join(', ');
+                    result.push({ name, size: `${sx}x${sz}x${sy}`, description: desc, materials: mats });
+                } catch {}
+            }
+        }
+        return result;
+    }
+
     start(name, position = null) {
         this.loadBlueprint(name);
         if (position) {

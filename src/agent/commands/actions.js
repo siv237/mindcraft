@@ -362,6 +362,24 @@ export const actionsList = [
         }
     },
     {
+        name: '!listBlueprints',
+        description: 'List all available building blueprints with their sizes and materials.',
+        perform: function (agent) {
+            if (!agent.build_controller) {
+                agent.build_controller = new BuildController(agent);
+            }
+            const list = agent.build_controller.listBlueprints();
+            if (list.length === 0) return 'No blueprints available.';
+            let msg = `Available blueprints (${list.length}):\n`;
+            for (const bp of list) {
+                msg += `  ${bp.name} (${bp.size}) — ${bp.description}\n`;
+                msg += `    Materials: ${bp.materials}\n`;
+            }
+            msg += `Use !startBuild("name") to build one.`;
+            return msg;
+        }
+    },
+    {
         name: '!startBuild',
         description: 'Start building a structure from a blueprint. The bot will continuously scan, gather materials, and place blocks until the structure is complete.',
         params: {
@@ -430,10 +448,13 @@ export const actionsList = [
             const missing = agent.build_controller.findMissingBlocks(10);
             const wrong = agent.build_controller.findWrongBlocks();
             const inv = agent.build_controller.getInventoryCounts();
-            let msg = `Build progress: ${progress.percent}% (${progress.placed}/${progress.total}). `;
+            const bpName = agent.build_controller.blueprint?.name || 'unknown';
+            const site = agent.build_controller.buildSite;
+            let msg = `Building '${bpName}' at (${site.x},${site.y},${site.z}). `;
+            msg += `Progress: ${progress.percent}% (${progress.placed}/${progress.total}). `;
             msg += `Phase: ${phase}. Wrong blocks: ${wrong.length}. `;
             if (missing.length > 0) {
-                msg += `Next blocks needed: `;
+                msg += `Next: `;
                 msg += missing.slice(0, 5).map(m => {
                     const wp = m.worldPos;
                     return `${m.blueprintBlock} at (${wp.x},${wp.y},${wp.z})`;
