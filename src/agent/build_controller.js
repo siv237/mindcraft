@@ -858,15 +858,17 @@ export class BuildController {
         } else if (haveLogs > 0) {
             gatherHint = `You already have ${haveLogs} oak_log. Craft planks: !craftRecipe("oak_planks", ${Math.min(haveLogs, 10)}). Then craft: !craftRecipe("${resolvedName}", 4).`;
         } else {
-            gatherHint = `Gather materials: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
+            const totalNeeded = Object.values(needed).reduce((a, b) => a + b, 0);
+            gatherHint = `FIRST try to collect existing ${resolvedName} blocks nearby from old structures: !collectBlocks("${resolvedName}", ${Math.min(totalNeeded, 30)}). `;
+            gatherHint += `If none found, gather raw materials: !collectBlocks("oak_log", 20). Then craft: !craftRecipe("oak_planks", 10).`;
         }
         return `BUILD PROGRESS: ${progress.percent}% (${progress.placed}/${progress.total}). ` +
             `Phase: ${this.phase}. Build site: ${siteStr}. Your position: ${posStr}.\n` +
             `MATERIALS NEEDED: ${neededStr}.\n` +
             `You need ${resolvedName}. ${gatherHint}\n` +
             `${toolHint}` +
-            `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. The build controller will place blocks automatically. ` +
-            `Only gather and craft materials. Respond:`;
+            `IMPORTANT: Do NOT use !placeHere or !newAction to place blocks. Do NOT discard materials. ` +
+            `The build controller will place blocks automatically. Only gather and craft. Respond:`;
     }
 
     saveState() {
