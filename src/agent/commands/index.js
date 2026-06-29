@@ -228,6 +228,19 @@ export async function executeCommand(agent, message) {
             if ((parsed.commandName === '!stop' || parsed.commandName === '!endGoal' || parsed.commandName === '!stfu') && agent.build_controller?.active) {
                 return `Cannot stop during building. The build controller is active. Use !newBuild to start a new build or ask the player to stop you.`;
             }
+            if (parsed.commandName === '!checkBuild' && agent.build_controller?.active && agent.self_prompter?.build_controller === agent.build_controller) {
+                const progress = agent.build_controller.computeProgress();
+                const phase = agent.build_controller.determinePhase();
+                const missing = agent.build_controller.findMissingBlocks(5);
+                const inv = agent.build_controller.getInventoryCounts();
+                let msg = `Build: ${progress.percent}% (${progress.placed}/${progress.total}), phase: ${phase}, wrong: ${progress.wrong}. `;
+                msg += `Inventory: ${Object.entries(inv).filter(([k,v]) => v > 0).map(([k,v]) => `${v}x ${k}`).join(', ') || 'empty'}. `;
+                if (missing.length > 0) {
+                    msg += `Next: ${missing[0].blueprintBlock} at (${missing[0].worldPos.x},${missing[0].worldPos.y},${missing[0].worldPos.z}). `;
+                }
+                msg += `Follow the build controller instructions. Craft or gather as instructed.`;
+                return msg;
+            }
             const result = await command.perform(agent, ...parsed.args);
             return result;
         }

@@ -55,7 +55,6 @@ export function discoverLanServer(timeout = 10000) {
         socket.bind(MULTICAST_PORT, () => {
             socket.addMembership(MULTICAST_ADDR);
             socket.setBroadcast(true);
-            console.log(`Listening for Minecraft LAN broadcasts on ${MULTICAST_ADDR}:${MULTICAST_PORT}...`);
         });
     });
 }
